@@ -2,6 +2,20 @@
 <head>
   <title>Prgump - webGL game</title>
   <link rel="stylesheet" type="text/css" href="style.css">
+
+  <script>
+    // shim layer with setTimeout fallback
+    window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       ||
+              window.webkitRequestAnimationFrame ||
+              window.mozRequestAnimationFrame    ||
+              window.oRequestAnimationFrame      ||
+              window.msRequestAnimationFrame     ||
+              function( callback ){
+                window.setTimeout(callback, 1000 / 100);
+              };
+    })();
+  </script>
   <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
   <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -9,7 +23,15 @@
     void main(void) {
         gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
     }
-</script>
+    </script>
+
+    <script id="shader-fs2" type="x-shader/x-fragment">
+      precision mediump float;
+
+      void main(void) {
+          gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
+      }
+      </script>
 
 <script id="shader-vs" type="x-shader/x-vertex">
     attribute vec3 aVertexPosition;
