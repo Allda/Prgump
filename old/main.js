@@ -178,11 +178,11 @@ function Player(){
     ];
 
     this.x = 0.0;
-    this.vx = 0.05;
+    this.vx = 0.01;
     this.y = 0.0;
     this.vy = 0.01;
     this.z = 0.0;
-    this.vz = 0.1;
+    this.vz = 0.01;
 
 
     this.initialize = function(){

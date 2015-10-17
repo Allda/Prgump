@@ -1,55 +1,24 @@
+<!DOCTYPE HTML>
+<meta charset="ISO-8859-2">
+
 <html>
-<head>
-  <title>Prgump - webGL game</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
+	<title>Prgump v0.1</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
 
-  <script>
-    // shim layer with setTimeout fallback
-    window.requestAnimFrame = (function(){
-      return  window.requestAnimationFrame       ||
-              window.webkitRequestAnimationFrame ||
-              window.mozRequestAnimationFrame    ||
-              window.oRequestAnimationFrame      ||
-              window.msRequestAnimationFrame     ||
-              function( callback ){
-                window.setTimeout(callback, 1000 / 100);
-              };
-    })();
-  </script>
-  <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
-  <script id="shader-fs" type="x-shader/x-fragment">
-    precision mediump float;
+	<body>
 
-    void main(void) {
-        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-    }
-    </script>
+ 		<script src="lib/jquery.min.js"></script>
+ 		<script src="lib/three.min.js"></script>
+ 		<script src="lib/keydrown.js"></script>
+ 		<script src="lib/OrbitControls.js"></script>
+ 		<script src="lib/Tween.js"></script>
+ 		<script src="lib/MTLLoader.js"></script>
+ 		<script src="lib/OBJMTLLoader.js"></script>
+ 		<script src="lib/JSONLoader.js"></script>
 
-    <script id="shader-fs2" type="x-shader/x-fragment">
-      precision mediump float;
+		<div id="webGL-container"></div>
 
-      void main(void) {
-          gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
-      }
-      </script>
-
-<script id="shader-vs" type="x-shader/x-vertex">
-    attribute vec3 aVertexPosition;
-
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
-
-    void main(void) {
-        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-    }
-</script>
-
-  <script src="main.js"></script>
-
-
-</head>
-
-<body>
-  <canvas id="myCanvas" height="600px" width="800px"></canvas>
-</body>
+ 		<script type="text/javascript" src="js/main.js"></script>
+ 	</body>
+	
 </html>
