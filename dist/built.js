@@ -1,4 +1,8 @@
-$(function(){
+function Player(){
+
+    
+}
+;$(function(){
 
     var scene, camera, renderer;
     var controls;
