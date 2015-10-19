@@ -8,7 +8,7 @@ $(function(){
     var keyboard;
     var playerAnim, yPlus;
     var mapSrc, map;
-    var world, playerPos, playerStat, playerMax;
+    var world, playerPos, playerStat;
 
     function init(){
         /*Creates empty scene object and renderer*/
@@ -117,7 +117,7 @@ $(function(){
         map = new Array();
 
         world = new Object();
-        world.y = parseInt(mapSrc.length) - 1;
+        world.y = parseInt(mapSrc.length);
         world.x = parseInt(mapSrc[0].match(/\d+/g)[0]);
         world.z = parseInt(mapSrc[0].match(/\d+/g)[1]);
         playerPos = new Object();
@@ -125,30 +125,27 @@ $(function(){
                       y: parseInt(mapSrc[0].match(/\d+/g)[3]),
                       z: parseInt(mapSrc[0].match(/\d+/g)[4]) };
 
-        playerMax = new Object();
-        playerMax.move = 1;
-        playerMax.jump = 1;
-
         playerStat = new Object();
         playerStat.jump = 1;
         playerStat.move = 1;
-        playerStat.jumpEn = false;
+        playerStat.moving = false;
+        yPlus = 0;
 
         var Box_geometry = new THREE.BoxGeometry( 1, 1, 1 );
         var type;
 
-        for (var y = 0; y < world.y; y++) {
-            map[y] = new Array();
+        for (var y = 1; y < world.y; y++) {
+            map[y-1] = new Array();
             for (var z = 0; z < world.x; z++) {
-                map[y][z] = new Array();
+                map[y-1][z] = new Array();
                 for (var x = 0; x < world.z; x++) {
-                    type = mapSrc[y+1].match(/\d+/g)[world.x * z + x];
-                    map[y][z][x] = type;
+                    type = mapSrc[y].match(/\d+/g)[world.x * z + x];
+                    map[y-1][z][x] = type;
                     if (type == 9) {
                         continue;
                     }
                     var cube = new THREE.Mesh( Box_geometry, textures[type] );
-                    cube.position.set(x, y, z);
+                    cube.position.set(x, y-1, z);
                     cube.castShadow = true;
                     cube.receiveShadow = true;
                     scene.add(cube);    
@@ -209,210 +206,179 @@ $(function(){
         sphere.position.z = playerPos.z;
 
         scene.add( sphere );
-
-        playerAnim = new TWEEN.Tween(sphere.position);
     }
 
     // Key W was pressed
-    kd.W.press(function () {
+    kd.W.down(function () {
         if ((playerPos.z > 0) && (playerStat.move > 0)) {
             // Go forward
-            playerCollision(0,-1);
+            playerCollision(0,0,-1);
         }
     });
 
     // Key A was pressed
-    kd.A.press(function () {
+    kd.A.down(function () {
         if ((playerPos.x > 0) && (playerStat.move > 0)) {
             // Go left
-            playerCollision(-1,0);
+            playerCollision(-1,0,0);
         }
     });
 
     // Key S was pressed
-    kd.S.press(function () {
+    kd.S.down(function () {
         if ((playerPos.z < (world.z-1)) && (playerStat.move > 0)) {
             // Go back
-            playerCollision(0,1);
+            playerCollision(0,0,1);
         }
     });
 
     // Key D was pressed
-    kd.D.press(function () {
+    kd.D.down(function () {
         if ((playerPos.x < (world.x-1)) && (playerStat.move > 0)) {
             // Go right
-            playerCollision(1,0);
-        }
-    });
-
-    kd.LEFT.press(function () {
-        if (playerStat.move > 1) {
-            playerStat.move -= 1;
-        }
-    });
-
-    kd.RIGHT.press(function () {
-        if (playerStat.move < playerMax.move) {
-            playerStat.move += 1;
-        }
-    });
-
-    kd.UP.press(function () {
-        if (playerStat.jump < playerMax.jump) {
-            playerStat.jump += 1;
-        }
-    });
-
-    kd.DOWN.press(function () {
-        if (playerStat.jump > 1) {
-            playerStat.jump -= 1;
+            playerCollision(1,0,0);
         }
     });
 
     // Key SPACE was pressed
     kd.SPACE.press(function () {
-        playerStat.jumpEn = !playerStat.jumpEn;
+        // Can player jump?
+        if ((playerPos.y < (world.y-2)) && (playerStat.jump > 0)) {
+            // Temporaly decrease high of jump
+            playerStat.jump -= 1;
+            var tween = new TWEEN.Tween(sphere.position);
+            // Can player jump to air?
+            if (map[playerPos.y+1][playerPos.z][playerPos.x] == 9) {
+                // Move player +1 higher
+                yPlus = 1;
+                tween.to({y:playerPos.y+1},500);
+            }
+            // Style of move
+            tween.easing(TWEEN.Easing.Cubic.In);
+ 
+            tween.onStart(function() {
+                playerStat.moving = true;
+            });
+ 
+            tween.onComplete(function() {
+                playerStat.moving = false;
+                yPlus = 0;
+                playerPos.y++;
+
+                var tween = new TWEEN.Tween(sphere.position);
+                var speed = playerPos.y;
+                for (var i = playerPos.y; i > 0; i--) {
+                    if (map[playerPos.y-1][playerPos.z][playerPos.x] == 9) {
+                        playerPos.y -= 1;
+                    }
+                };
+                // Speed is set about high of falling player
+                speed -= playerPos.y;
+                tween.easing(TWEEN.Easing.Cubic.InOut);
+
+                tween.onStart(function() {
+                    playerStat.moving = true;
+                });
+
+                tween.onComplete(function() {
+                    playerStat.moving = false;
+                    playerStat.jump += 1;
+                })
+
+                // Isn't some anim about player falling in chain?
+                if (speed) {
+                    tween.to({y:playerPos.y},speed*250);
+                    if (playerStat.moving) {
+                        playerAnim.chain(tween);
+                    } else {
+                        playerAnim = tween;
+                        playerAnim.start();
+                    }
+                } else {
+                    playerStat.jump += 1;
+                }
+            });
+            
+
+            if (playerStat.moving) {
+                playerAnim.chain(tween);
+            } else {
+                playerAnim = tween;
+                playerAnim.start();
+            }
+        }
     });
     
-    function playerCollision(dirX, dirZ) {
+    function playerCollision(x, y, z) {
+        // Temporaly decrease length of move
+        playerStat.move -= 1;
+        var tween = new TWEEN.Tween(sphere.position);
         // Can player move?
-        if (dirZ == 0) {
-            if (playerPos.y < (world.y-1)) {
-                for (var i = 1; i <= playerStat.jump; i++) {
-                    if (map[playerPos.y+i][playerPos.z][playerPos.x] == 9) {
-                        playerPos.y++;
-                        var tween = new TWEEN.Tween(sphere.position);
-                        tween.easing(TWEEN.Easing.Cubic.InOut);
-                        tween.to({ x:playerPos.x,
-                                   y:playerPos.y,
-                                   z:playerPos.z  }, 250);
-                        tween.onComplete(function() {
-                            playerAnim.setPlaying(false);
-                        })
-                        if (playerAnim.isPlaying()) {
-                            playerAnim.chain(tween);
-                        } else {
-                            playerAnim = tween;
-                            playerAnim.start();
-                        }
-                    } else {
-                        break;
-                    }
-                };
-            }
-            
-            for (var i = 0; i < playerStat.move; i++) {
-                if (map[playerPos.y][playerPos.z][playerPos.x+dirX] == 9) {
-                    playerPos.x += dirX;
-                    var tween = new TWEEN.Tween(sphere.position);
-                    tween.easing(TWEEN.Easing.Cubic.InOut);
-                    tween.to({ x:playerPos.x,
-                               y:playerPos.y,
-                               z:playerPos.z  }, 250);
-                    tween.onComplete(function() {
-                        playerAnim.setPlaying(false);
-                    })
-                    if (playerAnim.isPlaying()) {
-                        playerAnim.chain(tween);
-                    } else {
-                        playerAnim = tween;
-                        playerAnim.start();
-                    }
-                } else {
-                    break;
-                }                      
-            };
+        if (map[playerPos.y+y+yPlus][playerPos.z+z][playerPos.x+x] == 9) {
+            playerPos.x += x;
+            playerPos.y += y + yPlus;
+            playerPos.z += z;
+            tween.to({x:playerPos.x,
+                      y:playerPos.y,
+                      z:playerPos.z }, 250);
+        }
+        tween.easing(TWEEN.Easing.Cubic.InOut);
 
-            for (var i = playerPos.y-1; i > 0; i--) {
-                if (map[i][playerPos.z][playerPos.x] == 9) {
-                    playerPos.y--;
-                    var tween = new TWEEN.Tween(sphere.position);
-                    tween.easing(TWEEN.Easing.Cubic.InOut);
-                    tween.to({ x:playerPos.x,
-                               y:playerPos.y,
-                               z:playerPos.z  }, 250);
-                    tween.onComplete(function() {
-                        playerAnim.setPlaying(false);
-                    })
-                    if (playerAnim.isPlaying()) {
-                        playerAnim.chain(tween);
-                    } else {
-                        playerAnim = tween;
-                        playerAnim.start();
-                    }
-                } else {
-                    break;
-                }
-            };
+        tween.onStart(function() {
+            playerStat.moving = true;
+        });
+   
+        // Check if player will fall
+        tween.onComplete(function() {
+            playerStat.moving = false;
+            playerFall();
+        });
+   
+        
+        /*if (playerStat.jump == 0) {
+            tween.delay(250);
+        }*/
 
+        if (playerStat.moving) {
+            playerAnim.chain(tween);
         } else {
-            if (playerPos.y < (world.y-1)) {
-                for (var i = 1; i <= playerStat.jump; i++) {
-                    if (map[playerPos.y+i][playerPos.z][playerPos.x] == 9) {
-                        playerPos.y++;
-                        var tween = new TWEEN.Tween(sphere.position);
-                        tween.easing(TWEEN.Easing.Cubic.InOut);
-                        tween.to({ x:playerPos.x,
-                                   y:playerPos.y,
-                                   z:playerPos.z  }, 250);
-                        tween.onComplete(function() {
-                            playerAnim.setPlaying(false);
-                        })
-                        if (playerAnim.isPlaying()) {
-                            playerAnim.chain(tween);
-                        } else {
-                            playerAnim = tween;
-                            playerAnim.start();
-                        }
-                    } else {
-                        break;
-                    }
-                };
+            playerAnim = tween;
+            playerAnim.start();
+        }
+    }
+
+    function playerFall() {
+        var tween = new TWEEN.Tween(sphere.position);
+        var speed = playerPos.y;
+        for (var i = playerPos.y; i > 0; i--) {
+            if (map[playerPos.y-1][playerPos.z][playerPos.x] == 9) {
+                playerPos.y -= 1;
             }
+        };
+        // Speed is set about high of falling player
+        speed -= playerPos.y;
+      
+        tween.onStart(function() {
+            playerStat.moving = true;
+        });
 
-            for (var i = 0; i < playerStat.move; i++) {
-                if (map[playerPos.y][playerPos.z+dirZ][playerPos.x] == 9) {
-                    playerPos.z += dirZ;
-                    var tween = new TWEEN.Tween(sphere.position);
-                    tween.easing(TWEEN.Easing.Cubic.InOut);
-                    tween.to({ x:playerPos.x,
-                               y:playerPos.y,
-                               z:playerPos.z  }, 250);
-                    tween.onComplete(function() {
-                        playerAnim.setPlaying(false);
-                    })
-                    if (playerAnim.isPlaying()) {
-                        playerAnim.chain(tween);
-                    } else {
-                        playerAnim = tween;
-                        playerAnim.start();
-                    }
-                } else {
-                    break;
-                }                      
-            };
-
-            for (var i = playerPos.y-1; i > 0; i--) {
-                if (map[i][playerPos.z][playerPos.x] == 9) {
-                    playerPos.y--;
-                    var tween = new TWEEN.Tween(sphere.position);   
-                    tween.easing(TWEEN.Easing.Cubic.InOut);
-                    tween.to({ x:playerPos.x,
-                               y:playerPos.y,
-                               z:playerPos.z  }, 250);
-                    tween.onComplete(function() {
-                        playerAnim.setPlaying(false);
-                    })
-                    if (playerAnim.isPlaying()) {
-                        playerAnim.chain(tween);
-                    } else {
-                        playerAnim = tween;
-                        playerAnim.start();
-                    }
-                } else {
-                    break;
-                }
-            };
+        tween.onComplete(function() {
+            playerStat.moving = false;
+            // Increase length of move 
+            playerStat.move += 1;
+        });
+        
+        // Isn't some anim about player falling in chain?
+        if (speed) {
+            tween.to({y:playerPos.y},speed*250);
+            if (playerStat.moving) {
+                playerAnim.chain(tween);
+            } else {
+                playerAnim = tween;
+                playerAnim.start();
+            }
+        } else {
+            playerStat.move += 1;
         }
     }
 
