@@ -9,15 +9,40 @@
 
  		<script src="lib/jquery.min.js"></script>
  		<script src="lib/three.min.js"></script>
- 		<script src="lib/keydrown.js"></script>
  		<script src="lib/OrbitControls.js"></script>
  		<script src="lib/Tween.js"></script>
  		<script src="lib/MTLLoader.js"></script>
  		<script src="lib/OBJMTLLoader.js"></script>
  		<script src="lib/JSONLoader.js"></script>
+		<script src="lib/THREEx.KeyboardState.js"></script>
+		<script src="lib/Stats.js"></script>
 
 		<div id="webGL-container"></div>
+		<script>
+			var stats = new Stats();
+			stats.setMode( 1 ); // 0: fps, 1: ms, 2: mb
 
+			// align top-left
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.left = '0px';
+			stats.domElement.style.top = '0px';
+
+			document.body.appendChild( stats.domElement );
+
+			var update = function () {
+
+			stats.begin();
+
+			// monitored code goes here
+
+			stats.end();
+
+			requestAnimationFrame( update );
+
+			};
+
+			requestAnimationFrame( update );
+		</script>
  		<script type="text/javascript" src="dist/built.js"></script>
  	</body>
 

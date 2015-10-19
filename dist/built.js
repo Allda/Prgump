@@ -1,8 +1,103 @@
-function Player(){
+function Player(x,y,z){
+    this.x = x;
+    this.y = y;
+    this.z = z;
 
-    
+    this.geometry = new THREE.SphereGeometry( 0.5, 16, 16 );
+    this.material = new THREE.MeshBasicMaterial( {color: 0xff66ff} );
+    this.sphere = new THREE.Mesh( this.geometry, this.material );
+    this.sphere.position.x = x;
+    this.sphere.position.y = y;
+    this.sphere.position.z = z;
+
+    this.gravity = 0.01;
+    this.vy = 0.0;
+    this.falling = true;
+
+    this.getMeshObject = function(){
+        return this.sphere;
+    }
+
+    this.jump = function(){
+        this.vy = 0.5;
+    }
+
+    this.update = function(){
+        if(this.falling){
+            console.log("update" + this.falling);
+            this.y += this.vy;
+            this.vy -= this. gravity;
+
+        }
+        this.updateMesh();
+    }
+
+    this.updateMesh = function(){
+        this.sphere.position.x = this.x;
+        this.sphere.position.y = this.y;
+        this.sphere.position.z = this.z;
+    }
+
+    this.collision = function(colidableObjects){
+        var count = 0;
+        var flag = false;
+        for(i = 0; i < colidableObjects.length; i++){
+            var object = colidableObjects[i];
+            // floor colision
+            var xStart = this.x - this.sphere.scale.x/2;
+            var xEnd = this.x + this.sphere.scale.x/2;
+            var objectXStart = object.position.x - object.scale.x/2;
+            var objectXEnd = object.position.x + object.scale.x/2;
+
+            var yStart = this.y - this.sphere.scale.y/2;
+            var yEnd = this.y + this.sphere.scale.y/2;
+            var objectYStart = object.position.y - object.scale.y/2;
+            var objectYEnd = object.position.y + object.scale.y/2;
+
+            var zStart = this.z - this.sphere.scale.z/2;
+            var zEnd = this.z + this.sphere.scale.z/2;
+            var objectZStart = object.position.z - object.scale.z/2;
+            var objectZEnd = object.position.z + object.scale.z/2;
+
+            if(xStart < objectXEnd && xEnd > objectXStart){
+                if(zStart < objectZEnd && zEnd > objectZStart){
+                    if(yStart < objectYEnd && yEnd > objectYStart){
+                        flag = true;
+                        if(this.vy < 0){
+                            this.y = objectYEnd + this.sphere.scale.y/2;
+                            this.vy = 0.0;
+                            this.falling = false;
+                            //console.log("Colision")
+
+                        }
+                        /*else{
+
+                            this.y = objectYStart - this.sphere.scale.y/2-0.1;
+                            this.vy = 0;
+                            this.falling = true;
+                        }*/
+                    }
+                }
+            }
+            //down edge
+
+        }
+        if(flag){
+            this.sphere.material.color.set( 0x00ff00 );
+        }
+        else{
+            if(this.vy != 0){
+                this.falling = true;
+                this.sphere.material.color.set( 0x00ffff );
+
+            }
+        }
+    }
+
 }
-;$(function(){
+;var player;
+
+$(function(){
 
     var scene, camera, renderer;
     var controls;
@@ -12,6 +107,7 @@ function Player(){
     var keyboard;
     var playerAnim, yPlus;
     var mapSrc, map;
+
     var world, playerPos, playerStat, playerMax;
 
     function init(){
@@ -30,15 +126,13 @@ function Player(){
         controls.addEventListener( 'change', render );
 
         /*Add keyboard catch*/
-        kd.run(function () {
-            kd.tick();
-        });
+        keyboard = new THREEx.KeyboardState();
 
         /*Camera*/
         camera.position.x = 2;
         camera.position.y = 12;
         camera.position.z = 5;
-        camera.lookAt(scene.position);
+
 
         $("#webGL-container").append(renderer.domElement);
     }
@@ -151,11 +245,8 @@ function Player(){
                     if (type == 9) {
                         continue;
                     }
-                    var cube = new THREE.Mesh( Box_geometry, textures[type] );
-                    cube.position.set(x, y, z);
-                    cube.castShadow = true;
-                    cube.receiveShadow = true;
-                    scene.add(cube);
+                    var block = new Block(x, y, z, textures[type]);
+                    scene.add(block.getMeshObject());
                 };
             };
         };
@@ -205,226 +296,47 @@ function Player(){
         );*/
 
 
-        var geometry = new THREE.SphereGeometry( 0.5, 16, 16 );
-        var material = new THREE.MeshBasicMaterial( {color: 0xff66ff} );
-        sphere = new THREE.Mesh( geometry, material );
-        sphere.position.x = playerPos.x;
-        sphere.position.y = playerPos.y;
-        sphere.position.z = playerPos.z;
+        player = new Player(3,3,3);
 
-        scene.add( sphere );
 
-        playerAnim = new TWEEN.Tween(sphere.position);
+        scene.add(player.getMeshObject());
+
+        playerAnim = new TWEEN.Tween(player.getMeshObject().possition);
+
     }
-
-    // Key W was pressed
-    kd.W.press(function () {
-        if ((playerPos.z > 0) && (playerStat.move > 0)) {
-            // Go forward
-            playerCollision(0,-1);
+    function update(){
+        if(keyboard.pressed("W")){
+            player.z -=0.2;
         }
-    });
-
-    // Key A was pressed
-    kd.A.press(function () {
-        if ((playerPos.x > 0) && (playerStat.move > 0)) {
-            // Go left
-            playerCollision(-1,0);
+        if(keyboard.pressed("S")){
+            player.z +=0.2;
         }
-    });
-
-    // Key S was pressed
-    kd.S.press(function () {
-        if ((playerPos.z < (world.z-1)) && (playerStat.move > 0)) {
-            // Go back
-            playerCollision(0,1);
+        if(keyboard.pressed("A")){
+            player.x -=0.2;
         }
-    });
-
-    // Key D was pressed
-    kd.D.press(function () {
-        if ((playerPos.x < (world.x-1)) && (playerStat.move > 0)) {
-            // Go right
-            playerCollision(1,0);
+        if(keyboard.pressed("D")){
+            player.x +=0.2;
         }
-    });
-
-    kd.LEFT.press(function () {
-        if (playerStat.move > 1) {
-            playerStat.move -= 1;
+        if(keyboard.pressed("space")){
+            player.jump();
         }
-    });
 
-    kd.RIGHT.press(function () {
-        if (playerStat.move < playerMax.move) {
-            playerStat.move += 1;
-        }
-    });
-
-    kd.UP.press(function () {
-        if (playerStat.jump < playerMax.jump) {
-            playerStat.jump += 1;
-        }
-    });
-
-    kd.DOWN.press(function () {
-        if (playerStat.jump > 1) {
-            playerStat.jump -= 1;
-        }
-    });
-
-    // Key SPACE was pressed
-    kd.SPACE.press(function () {
-        playerStat.jumpEn = !playerStat.jumpEn;
-    });
-
-    function playerCollision(dirX, dirZ) {
-        // Can player move?
-        if (dirZ == 0) {
-            if (playerPos.y < (world.y-1)) {
-                for (var i = 1; i <= playerStat.jump; i++) {
-                    if (map[playerPos.y+i][playerPos.z][playerPos.x] == 9) {
-                        playerPos.y++;
-                        var tween = new TWEEN.Tween(sphere.position);
-                        tween.easing(TWEEN.Easing.Cubic.InOut);
-                        tween.to({ x:playerPos.x,
-                                   y:playerPos.y,
-                                   z:playerPos.z  }, 250);
-                        tween.onComplete(function() {
-                            playerAnim.setPlaying(false);
-                        })
-                        if (playerAnim.isPlaying()) {
-                            playerAnim.chain(tween);
-                        } else {
-                            playerAnim = tween;
-                            playerAnim.start();
-                        }
-                    } else {
-                        break;
-                    }
-                };
-            }
-
-            for (var i = 0; i < playerStat.move; i++) {
-                if (map[playerPos.y][playerPos.z][playerPos.x+dirX] == 9) {
-                    playerPos.x += dirX;
-                    var tween = new TWEEN.Tween(sphere.position);
-                    tween.easing(TWEEN.Easing.Cubic.InOut);
-                    tween.to({ x:playerPos.x,
-                               y:playerPos.y,
-                               z:playerPos.z  }, 250);
-                    tween.onComplete(function() {
-                        playerAnim.setPlaying(false);
-                    })
-                    if (playerAnim.isPlaying()) {
-                        playerAnim.chain(tween);
-                    } else {
-                        playerAnim = tween;
-                        playerAnim.start();
-                    }
-                } else {
-                    break;
-                }
-            };
-
-            for (var i = playerPos.y-1; i > 0; i--) {
-                if (map[i][playerPos.z][playerPos.x] == 9) {
-                    playerPos.y--;
-                    var tween = new TWEEN.Tween(sphere.position);
-                    tween.easing(TWEEN.Easing.Cubic.InOut);
-                    tween.to({ x:playerPos.x,
-                               y:playerPos.y,
-                               z:playerPos.z  }, 250);
-                    tween.onComplete(function() {
-                        playerAnim.setPlaying(false);
-                    })
-                    if (playerAnim.isPlaying()) {
-                        playerAnim.chain(tween);
-                    } else {
-                        playerAnim = tween;
-                        playerAnim.start();
-                    }
-                } else {
-                    break;
-                }
-            };
-
-        } else {
-            if (playerPos.y < (world.y-1)) {
-                for (var i = 1; i <= playerStat.jump; i++) {
-                    if (map[playerPos.y+i][playerPos.z][playerPos.x] == 9) {
-                        playerPos.y++;
-                        var tween = new TWEEN.Tween(sphere.position);
-                        tween.easing(TWEEN.Easing.Cubic.InOut);
-                        tween.to({ x:playerPos.x,
-                                   y:playerPos.y,
-                                   z:playerPos.z  }, 250);
-                        tween.onComplete(function() {
-                            playerAnim.setPlaying(false);
-                        })
-                        if (playerAnim.isPlaying()) {
-                            playerAnim.chain(tween);
-                        } else {
-                            playerAnim = tween;
-                            playerAnim.start();
-                        }
-                    } else {
-                        break;
-                    }
-                };
-            }
-
-            for (var i = 0; i < playerStat.move; i++) {
-                if (map[playerPos.y][playerPos.z+dirZ][playerPos.x] == 9) {
-                    playerPos.z += dirZ;
-                    var tween = new TWEEN.Tween(sphere.position);
-                    tween.easing(TWEEN.Easing.Cubic.InOut);
-                    tween.to({ x:playerPos.x,
-                               y:playerPos.y,
-                               z:playerPos.z  }, 250);
-                    tween.onComplete(function() {
-                        playerAnim.setPlaying(false);
-                    })
-                    if (playerAnim.isPlaying()) {
-                        playerAnim.chain(tween);
-                    } else {
-                        playerAnim = tween;
-                        playerAnim.start();
-                    }
-                } else {
-                    break;
-                }
-            };
-
-            for (var i = playerPos.y-1; i > 0; i--) {
-                if (map[i][playerPos.z][playerPos.x] == 9) {
-                    playerPos.y--;
-                    var tween = new TWEEN.Tween(sphere.position);
-                    tween.easing(TWEEN.Easing.Cubic.InOut);
-                    tween.to({ x:playerPos.x,
-                               y:playerPos.y,
-                               z:playerPos.z  }, 250);
-                    tween.onComplete(function() {
-                        playerAnim.setPlaying(false);
-                    })
-                    if (playerAnim.isPlaying()) {
-                        playerAnim.chain(tween);
-                    } else {
-                        playerAnim = tween;
-                        playerAnim.start();
-                    }
-                } else {
-                    break;
-                }
-            };
-        }
+        player.update();
+        player.collision(blockList);
+        camera.lookAt(player.getMeshObject().position);
+        camera.position.x = player.x;
+        camera.position.y = player.y+2;
+        camera.position.z = player.z+5
     }
 
     function render() {}
 
     function animate(){
         requestAnimationFrame(animate);
+        update();
         TWEEN.update();
+
+        camera.lookAt(player.getMeshObject().position);
         render();
 
         renderer.render(scene, camera);
@@ -444,3 +356,19 @@ function Player(){
     });
 
 });
+;var blockList = []
+
+function Block(x, y, z, texture){
+    this.geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    this.texture = texture;
+    this.cube = new THREE.Mesh( this.geometry, texture);
+    this.cube.position.set(x, y, z);
+    this.cube.castShadow = true;
+    this.cube.receiveShadow = true;
+
+    blockList.push(this.cube);
+
+    this.getMeshObject = function(){
+        return this.cube;
+    }
+}

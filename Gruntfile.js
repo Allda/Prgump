@@ -7,7 +7,7 @@ grunt.initConfig({
       separator: ';',
     },
     jsfiles: {
-      src: ['js/player.js', 'js/main.js'],
+      src: ['js/player.js', 'js/main.js', 'js/block.js'],
       dest: 'dist/built.js',
     },
   },
