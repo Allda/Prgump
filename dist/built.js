@@ -23,9 +23,9 @@ function Player(x,y,z){
     }
 
     this.update = function(){
+
+        this.y += this.vy;
         if(this.falling){
-            console.log("update" + this.falling);
-            this.y += this.vy;
             this.vy -= this. gravity;
 
         }
@@ -63,19 +63,18 @@ function Player(x,y,z){
                 if(zStart < objectZEnd && zEnd > objectZStart){
                     if(yStart < objectYEnd && yEnd > objectYStart){
                         flag = true;
-                        if(this.vy < 0){
-                            this.y = objectYEnd + this.sphere.scale.y/2;
+                        if(this.vy <= 0){
+                            this.y = objectYEnd + this.sphere.scale.y/2-0.01;
                             this.vy = 0.0;
                             this.falling = false;
                             //console.log("Colision")
 
                         }
-                        /*else{
-
+                        else{
                             this.y = objectYStart - this.sphere.scale.y/2-0.1;
                             this.vy = 0;
                             this.falling = true;
-                        }*/
+                        }
                     }
                 }
             }
@@ -86,11 +85,8 @@ function Player(x,y,z){
             this.sphere.material.color.set( 0x00ff00 );
         }
         else{
-            if(this.vy != 0){
-                this.falling = true;
-                this.sphere.material.color.set( 0x00ffff );
-
-            }
+            this.falling = true;
+            this.sphere.material.color.set( 0x00ffff );
         }
     }
 
