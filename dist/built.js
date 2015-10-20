@@ -13,6 +13,12 @@ function Player(x,y,z){
     this.gravity = 0.01;
     this.vy = 0.0;
     this.falling = true;
+    this.floorCollision = false;
+    this.velocity = 0.1;
+    this.leftFlag = false;
+    this.rightFlag = false;
+    this.forwardFlag = false;
+    this.backwardFlag = false;
 
     this.getMeshObject = function(){
         return this.sphere;
@@ -36,6 +42,33 @@ function Player(x,y,z){
         this.sphere.position.x = this.x;
         this.sphere.position.y = this.y;
         this.sphere.position.z = this.z;
+    }
+
+    this.moveLeft = function(){
+        this.x -= this.velocity;
+        this.leftFlag = true;
+    }
+
+    this.moveRight = function(){
+        this.x += this.velocity;
+        this.rightFlag = true;
+    }
+
+    this.moveForward = function(){
+        this.z -= this.velocity;
+        this.forwardFlag = true;
+    }
+
+    this.moveBackward = function(){
+        this.z += this.velocity;
+        this.backwardFlag = true;
+    }
+
+    this.resetFlags = function(){
+        this.leftFlag = false;
+        this.rightFlag = false;
+        this.forwardFlag = false;
+        this.backwardFlag = false;
     }
 
     this.collision = function(colidableObjects){
@@ -63,23 +96,34 @@ function Player(x,y,z){
                 if(zStart < objectZEnd && zEnd > objectZStart){
                     if(yStart < objectYEnd && yEnd > objectYStart){
                         flag = true;
-                        if(this.vy <= 0){
-                            this.y = objectYEnd + this.sphere.scale.y/2-0.01;
-                            this.vy = 0.0;
-                            this.falling = false;
-                            //console.log("Colision")
-
+                        if(!this.floorCollision){
+                            if(this.vy <= 0){
+                                this.y = objectYEnd + this.sphere.scale.y/2-0.01;
+                                this.vy = 0.0;
+                                this.falling = false;
+                                this.floorCollision = true;
+                            }
+                            else{
+                                this.y = objectYStart - this.sphere.scale.y/2-0.1;
+                                this.vy = 0;
+                                this.falling = true;
+                            }
                         }
-                        else{
-                            this.y = objectYStart - this.sphere.scale.y/2-0.1;
-                            this.vy = 0;
-                            this.falling = true;
+                        if(this.leftFlag && (this.y - objectYEnd - this.getMeshObject().scale.y/2) < -0.1){
+                            this.x = objectXEnd + this.getMeshObject().scale.x/2;
+                        }
+                        else if(this.rightFlag && (this.y - objectYEnd - this.getMeshObject().scale.y/2) < -0.1){
+                            this.x = objectXStart - this.getMeshObject().scale.x/2;
+                        }
+                        else if(this.forwardFlag && (this.y - objectYEnd - this.getMeshObject().scale.y/2) < -0.1){
+                            this.z = objectZEnd + this.getMeshObject().scale.z/2;
+                        }
+                        else if(this.backwardFlag && (this.y - objectYEnd - this.getMeshObject().scale.y/2) < -0.1){
+                            this.z = objectZStart - this.getMeshObject().scale.z/2;
                         }
                     }
                 }
             }
-            //down edge
-
         }
         if(flag){
             this.sphere.material.color.set( 0x00ff00 );
@@ -87,7 +131,9 @@ function Player(x,y,z){
         else{
             this.falling = true;
             this.sphere.material.color.set( 0x00ffff );
+            this.floorCollision = false;
         }
+        this.resetFlags();
     }
 
 }
@@ -302,16 +348,16 @@ $(function(){
     }
     function update(){
         if(keyboard.pressed("W")){
-            player.z -=0.2;
+            player.moveForward();
         }
         if(keyboard.pressed("S")){
-            player.z +=0.2;
+            player.moveBackward();
         }
         if(keyboard.pressed("A")){
-            player.x -=0.2;
+            player.moveLeft();
         }
         if(keyboard.pressed("D")){
-            player.x +=0.2;
+            player.moveRight();
         }
         if(keyboard.pressed("space")){
             player.jump();

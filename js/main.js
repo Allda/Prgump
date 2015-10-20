@@ -209,16 +209,16 @@ $(function(){
     }
     function update(){
         if(keyboard.pressed("W")){
-            player.z -=0.2;
+            player.moveForward();
         }
         if(keyboard.pressed("S")){
-            player.z +=0.2;
+            player.moveBackward();
         }
         if(keyboard.pressed("A")){
-            player.x -=0.2;
+            player.moveLeft();
         }
         if(keyboard.pressed("D")){
-            player.x +=0.2;
+            player.moveRight();
         }
         if(keyboard.pressed("space")){
             player.jump();
