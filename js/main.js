@@ -36,8 +36,8 @@ $(function(){
         camera.position.y = 12;
         camera.position.z = 5;
 
-
         $("#webGL-container").append(renderer.domElement);
+
     }
 
     function setScene() {
@@ -56,6 +56,28 @@ $(function(){
         spotLight.shadowMapHeight = 1024;
         spotLight.name = 'Spot Light';
         scene.add( spotLight );
+
+        /*Skybox*/
+        var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+        var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+
+        var urlPrefix = "textures/";
+        var urls = [ urlPrefix + "skybox_ice1.jpg", urlPrefix + "skybox_ice3.jpg",
+        urlPrefix + "skybox_ice0.jpg", urlPrefix + "skybox_ice5.jpg",
+        urlPrefix + "skybox_ice4.jpg", urlPrefix + "skybox_ice2.jpg" ];
+
+        var materialArray = [];
+        for (var i = 0; i < 6; i++)
+            materialArray.push( new THREE.MeshBasicMaterial({
+              map: THREE.ImageUtils.loadTexture( urls[i] ),
+              side: THREE.BackSide
+            }));
+
+        var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+        var skyGeometry = new THREE.BoxGeometry( 500, 500, 500 );
+        var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+
+        scene.add( skyBox );
 
        /* var spotLightHelper = new THREE.SpotLightHelper( spotLight );
         scene.add( spotLightHelper );*/
@@ -226,10 +248,10 @@ $(function(){
 
         player.update();
         player.collision(blockList);
-        camera.lookAt(player.getMeshObject().position);
+        /*camera.lookAt(player.getMeshObject().position);
         camera.position.x = player.x;
         camera.position.y = player.y+2;
-        camera.position.z = player.z+5
+        camera.position.z = player.z+5*/
     }
 
     function render() {}
