@@ -1,5 +1,6 @@
 var player;
 var level = "1";
+var star;
 
 $(function(){
 
@@ -177,59 +178,18 @@ $(function(){
             };
         };
 
-        // prepare loader and load the model
-       /* var oLoader = new THREE.OBJMTLLoader();
-        oLoader.load('models/player.obj', 'models/player.mtl', function(object, materials) {
-
-        var material = new THREE.MeshFaceMaterial(materials);
-        //var material2 = new THREE.MeshLambertMaterial({ color: 0xa65e00 });
-
-        object.traverse( function(child) {
-            if (child instanceof THREE.Mesh) {
-
-            // apply custom material
-            child.material = material;
-
-            // enable casting shadows
-            child.castShadow = true;
-            child.receiveShadow = true;
-        }
-        });
-
-        object.position.x = 0;
-        object.position.y = 5;
-        object.position.z = 0;
-        object.scale.set(1, 1, 1);
-        scene.add(object);*/
-
-        // instantiate a loader
-       /* var loader = new THREE.JSONLoader();
-
-        // load a resource
-        loader.load(
-            // resource URL
-            'models/teapot.json',
-            // Function when resource is loaded
-            function ( geometry, materials ) {
-                var material = new THREE.MeshFaceMaterial( materials );
-                var object = new THREE.Mesh( geometry, material );
-                object.position.x = 0;
-                object.position.y = 5;
-                object.position.z = 0;
-                object.scale.set(1, 1, 1);
-                scene.add( object );
-            }
-        );*/
-
+        star = new Collectibles(3, 4, 0);
+        star.setTranslation(0, 0.5, 0, 0.02);
+        star.setRotate(0, 1, 0, 0.02);
+        star.loadModel('star', scene);
 
         player = new Player(3,3,3);
-
-
         scene.add(player.getMeshObject());
 
         playerAnim = new TWEEN.Tween(player.getMeshObject().possition);
 
     }
+
     function update(){
         if(keyboard.pressed("W")){
             player.moveForward();
@@ -257,6 +217,10 @@ $(function(){
         camera.position.x = player.x;
         camera.position.y = player.y+2;
         camera.position.z = player.z+5*/
+
+        if (star.isLoaded()) {
+            star.update();
+        }
     }
 
     function render() {}
