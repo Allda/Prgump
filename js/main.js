@@ -1,4 +1,5 @@
 var player;
+var level = "1";
 
 $(function(){
 
@@ -245,6 +246,10 @@ $(function(){
         if(keyboard.pressed("space")){
             player.jump();
         }
+        if(keyboard.pressed("esc")){
+            $(".gameControl").show();
+            $(".gameContent").hide();
+        }
 
         player.update();
         player.collision(blockList);
@@ -279,5 +284,42 @@ $(function(){
         camera.updateProjectionMatrix();
         renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
     });
+    $("#startGame").click(function(){
+        console.log("start");
+        $(".gameControl").fadeOut("slow", function(){
+            $(".gameContent").fadeIn("slow");
+        });
 
+    });
+
+    $("#selectLevel").click(function(){
+        $("#options").fadeOut("slow", function(){
+            $("#levels").fadeIn("slow");
+        });
+    });
+
+    $(".backLevel").click(function(){
+        $("#levels").fadeOut("slow", function(){
+            $("#options").fadeIn("slow");
+        });
+    });
+
+    $("#about").click(function(){
+        $("#options").fadeOut("slow", function(){
+            $(".about").fadeIn("slow");
+        });
+    });
+
+    $(".backAbout").click(function(){
+        $(".about").fadeOut("slow", function(){
+            $("#options").fadeIn("slow");
+        });
+    });
+
+    $(".level").click(function(){
+        level = $(this).html().split(" ")[1];
+        $("#levels").fadeOut("slow", function(){
+            $("#options").fadeIn("slow");
+        });
+    });
 });

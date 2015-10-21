@@ -1,49 +1,79 @@
 <!DOCTYPE HTML>
-<meta charset="ISO-8859-2">
-
 <html>
-	<title>Prgump v0.1</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<head>
+		<meta charset="ISO-8859-2">
+		<title>Prgump v0.1</title>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<script src="lib/jquery.min.js"></script>
+		<script src="lib/three.min.js"></script>
+		<script src="lib/OrbitControls.js"></script>
+		<script src="lib/Tween.js"></script>
+		<script src="lib/MTLLoader.js"></script>
+		<script src="lib/OBJMTLLoader.js"></script>
+		<script src="lib/JSONLoader.js"></script>
+		<script src="lib/THREEx.KeyboardState.js"></script>
+		<script src="lib/Stats.js"></script>
+		<script type="text/javascript" src="dist/built.js"></script>
+	</head>
 
 	<body>
 
- 		<script src="lib/jquery.min.js"></script>
- 		<script src="lib/three.min.js"></script>
- 		<script src="lib/OrbitControls.js"></script>
- 		<script src="lib/Tween.js"></script>
- 		<script src="lib/MTLLoader.js"></script>
- 		<script src="lib/OBJMTLLoader.js"></script>
- 		<script src="lib/JSONLoader.js"></script>
-		<script src="lib/THREEx.KeyboardState.js"></script>
-		<script src="lib/Stats.js"></script>
+		<div class="gameControl">
+			<h1>PGRump</h1>
+			<ul id="options">
+				<li id="startGame">Start</li>
+				<li id="selectLevel">Select level</li>
+				<li id="about">About</li>
+			</ul>
 
-		<div id="webGL-container"></div>
-		<script>
-			var stats = new Stats();
-			stats.setMode( 1 ); // 0: fps, 1: ms, 2: mb
+			<ul id="levels">
+				<li class="level">level 1</li>
+				<li class="level">level 2</li>
+				<li class="level">level 3</li>
+				<li class="back backLevel">Back</li>
+			</ul>
+			<div class="about">
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus elementum pellentesque enim, sit amet maximus orci luctus finibus. Nunc urna nulla, sollicitudin vel porttitor tincidunt, lacinia vitae nisi. Donec volutpat aliquam lectus, vel hendrerit ipsum ornare faucibus. Integer id sem turpis. Sed a massa neque. Donec commodo ligula nibh, ac mattis justo finibus non. In in eleifend nunc. Aenean tincidunt purus et purus placerat, non lobortis odio scelerisque. Morbi ultricies placerat mi accumsan aliquam. Fusce sed diam id quam elementum ultrices.
+				<ul id="aboutUl">
+					<li class="back backAbout">Back</li>
+				</ul>
+			</div>
+		</div>
 
-			// align top-left
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.left = '0px';
-			stats.domElement.style.top = '0px';
+		</div>
+		<div class="gameContent">
+			<div class="gameInfo">
+				<div class="score">Score: 15</div>
+			</div>
+			<div id="webGL-container"></div>
+			<script>
+				var stats = new Stats();
+				stats.setMode( 1 ); // 0: fps, 1: ms, 2: mb
 
-			document.body.appendChild( stats.domElement );
+				// align top-left
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.left = '0px';
+				stats.domElement.style.top = '0px';
 
-			var update = function () {
+				document.body.appendChild( stats.domElement );
 
-			stats.begin();
+				var update = function () {
 
-			// monitored code goes here
+				stats.begin();
 
-			stats.end();
+				// monitored code goes here
 
-			requestAnimationFrame( update );
+				stats.end();
 
-			};
+				requestAnimationFrame( update );
 
-			requestAnimationFrame( update );
-		</script>
- 		<script type="text/javascript" src="dist/built.js"></script>
+				};
+
+				requestAnimationFrame( update );
+			</script>
+		</div>
+
+
  	</body>
 
 </html>
