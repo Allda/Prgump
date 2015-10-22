@@ -12,6 +12,8 @@ $(function(){
     var keyboard;
     var playerAnim, yPlus;
     var mapSrc, map;
+    var animatedLava;
+    var clock = new THREE.Clock();
 
     var world, playerPos, playerStat, playerMax;
 
@@ -59,6 +61,7 @@ $(function(){
         spotLight.name = 'Spot Light';
         scene.add( spotLight );
 
+
         /*Skybox*/
         var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
         var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
@@ -85,11 +88,14 @@ $(function(){
         scene.add( spotLightHelper );*/
 
         /* Crates */
-        var texName = ["floor.png", "water.jpg", "grass.jpg", "lava.jpg", "crate.png", "stone.jpg", "snow.jpg"];
+        var texName = ["floor.png", "water.jpg", "grass.jpg", "lava.png", "crate.png", "stone.jpg", "snow.jpg"];
         var textures = [];
 
         for (var i = 0; i < texName.length; i++) {
             var fTex = new THREE.ImageUtils.loadTexture("textures/" + texName[i]);
+            if(texName[i] == "lava.png"){
+                animatedLava = new TextureAnimator( fTex, 3, 3, 9, 120 ); // texture, #horiz, #vert, #total, duration.
+            }
             var tex = new THREE.MeshBasicMaterial( { map: fTex } )
             textures.push(tex);
         };
@@ -104,9 +110,9 @@ $(function(){
                 "1 0 0 2 2 2\n" +
                 "0 0 0 0 0 0",
 
-                "1 9 9 5 5 5\n" +
-                "9 9 9 9 3 5\n" +
-                "9 9 9 9 9 5\n" +
+                "3 3 9 5 5 5\n" +
+                "3 3 9 9 3 5\n" +
+                "3 9 9 9 9 5\n" +
                 "9 9 4 4 9 9\n" +
                 "9 9 4 4 9 9\n" +
                 "9 9 9 9 9 9",
@@ -211,6 +217,8 @@ $(function(){
             $(".gameContent").hide();
         }
 
+        var delta = clock.getDelta();
+        animatedLava.update(1000 * delta);
         player.update();
         player.collision(blockList);
         /*camera.lookAt(player.getMeshObject().position);
@@ -240,6 +248,45 @@ $(function(){
     setScene();
 
     animate();
+
+    function TextureAnimator(texture, tilesHoriz, tilesVert, numTiles, tileDispDuration)
+{
+	// note: texture passed by reference, will be updated by the update function.
+
+	this.tilesHorizontal = tilesHoriz;
+	this.tilesVertical = tilesVert;
+	// how many images does this spritesheet contain?
+	//  usually equals tilesHoriz * tilesVert, but not necessarily,
+	//  if there at blank tiles at the bottom of the spritesheet.
+	this.numberOfTiles = numTiles;
+	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+	texture.repeat.set( 1 / this.tilesHorizontal, 1 / this.tilesVertical );
+
+	// how long should each image be displayed?
+	this.tileDisplayDuration = tileDispDuration;
+
+	// how long has the current image been displayed?
+	this.currentDisplayTime = 0;
+
+	// which image is currently being displayed?
+	this.currentTile = 0;
+
+	this.update = function( milliSec )
+	{
+		this.currentDisplayTime += milliSec;
+		while (this.currentDisplayTime > this.tileDisplayDuration)
+		{
+			this.currentDisplayTime -= this.tileDisplayDuration;
+			this.currentTile++;
+			if (this.currentTile == this.numberOfTiles)
+				this.currentTile = 0;
+			var currentColumn = this.currentTile % this.tilesHorizontal;
+			texture.offset.x = currentColumn / this.tilesHorizontal;
+			var currentRow = Math.floor( this.currentTile / this.tilesHorizontal );
+			texture.offset.y = currentRow / this.tilesVertical;
+		}
+	};
+}
 
     $(window).resize(function(){
         SCREEN_WIDTH = window.innerWidth;
