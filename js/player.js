@@ -136,4 +136,36 @@ function Player(x,y,z){
         this.resetFlags();
     }
 
+
+    this.collisionBonus = function(bonusList){
+        for (var i = 0; i < bonusList.length; i++) {
+            object = bonusList[i];
+            objectMesh = object.getMeshObject();
+            if (!objectMesh)
+                continue;
+            var xStart = this.x - this.sphere.scale.x/2;
+            var xEnd = this.x + this.sphere.scale.x/2;
+            var objectXStart = objectMesh.position.x - objectMesh.scale.x/2;
+            var objectXEnd = objectMesh.position.x + objectMesh.scale.x/2;
+
+            var yStart = this.y - this.sphere.scale.y/2;
+            var yEnd = this.y + this.sphere.scale.y/2;
+            var objectYStart = objectMesh.position.y - objectMesh.scale.y/2;
+            var objectYEnd = objectMesh.position.y + objectMesh.scale.y/2;
+
+            var zStart = this.z - this.sphere.scale.z/2;
+            var zEnd = this.z + this.sphere.scale.z/2;
+            var objectZStart = objectMesh.position.z - objectMesh.scale.z/2;
+            var objectZEnd = objectMesh.position.z + objectMesh.scale.z/2;
+
+            if(xStart < objectXEnd && xEnd > objectXStart){
+                if(zStart < objectZEnd && zEnd > objectZStart){
+                    if(yStart < objectYEnd && yEnd > objectYStart){
+                        console.log("collision");
+                    }
+                }
+            }
+        }
+    }
+
 }

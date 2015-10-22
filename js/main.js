@@ -220,6 +220,7 @@ $(function(){
         var delta = clock.getDelta();
         animatedLava.update(1000 * delta);
         player.update();
+        player.collisionBonus(starList);
         player.collision(blockList);
         /*camera.lookAt(player.getMeshObject().position);
         camera.position.x = player.x;

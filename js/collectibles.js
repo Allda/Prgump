@@ -1,3 +1,5 @@
+var starList = [];
+
 function Collectibles(x,y,z) {
     var orig = new THREE.Vector3(x,y,z);
     var dest = new THREE.Vector3();
@@ -5,13 +7,14 @@ function Collectibles(x,y,z) {
     var falling = false;
     var speedTrans;
     var speedRotate;
+    starList.push(this);
 
     var model;
     var loaded = false;
 
-    /*this.getModel = function() {
+    this.getMeshObject = function() {
         return model;
-    }*/
+    }
 
     this.isLoaded = function() {
         return loaded;
@@ -89,4 +92,5 @@ function Collectibles(x,y,z) {
             }
         }
     }
+
 }
