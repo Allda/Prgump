@@ -1,23 +1,22 @@
 var player;
 var level = "1";
-var star;
+var keyboard;
 
-$(function(){
+function Game(){
 
     var scene, camera, renderer;
     var controls;
     var stats;
     var spotLight, cube, sphere;
     var SCREEN_WIDTH, SCREEN_HEIGHT;
-    var keyboard;
-    var playerAnim, yPlus;
-    var mapSrc, map;
+
     var animatedLava;
     var clock = new THREE.Clock();
+    var textures = [];
 
-    var world, playerPos, playerStat, playerMax;
+    var world, playerPos;
 
-    function init(){
+    this.init = function(){
         /*Creates empty scene object and renderer*/
         scene = new THREE.Scene();
         camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, .1, 500);
@@ -30,7 +29,7 @@ $(function(){
 
         /*Add controls*/
         controls = new THREE.OrbitControls( camera, renderer.domElement );
-        controls.addEventListener( 'change', render );
+        controls.addEventListener( 'change', this.render );
 
         /*Add keyboard catch*/
         keyboard = new THREEx.KeyboardState();
@@ -44,8 +43,26 @@ $(function(){
 
     }
 
-    function setScene() {
-        /*Lights*/
+    this.setScene = function() {
+        this.initLight(false);
+        this.initSkyBox();
+        this.loadTextures();
+        this.loadWorld();
+
+        this.initCollectibles();
+
+        player = new Player(3,3,3);
+        scene.add(player.getMeshObject());
+    }
+
+    this.initCollectibles = function(){
+        var star = new Collectibles(3, 4, 0);
+        star.setTranslation(0, 0.5, 0, 0.02);
+        star.setRotate(0, 1, 0, 0.02);
+        star.loadModel('star', scene);
+    }
+
+    this.initLight = function(help){
         var ambient = new THREE.AmbientLight( 0x404040 );
         scene.add( ambient );
 
@@ -60,9 +77,13 @@ $(function(){
         spotLight.shadowMapHeight = 1024;
         spotLight.name = 'Spot Light';
         scene.add( spotLight );
+        if(help){
+             var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+             scene.add( spotLightHelper );
+        }
+    }
 
-
-        /*Skybox*/
+    this.initSkyBox = function(){
         var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
         var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 
@@ -83,13 +104,10 @@ $(function(){
         var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 
         scene.add( skyBox );
+    }
 
-       /* var spotLightHelper = new THREE.SpotLightHelper( spotLight );
-        scene.add( spotLightHelper );*/
-
-        /* Crates */
+    this.loadTextures = function(){
         var texName = ["floor.png", "water.jpg", "grass.jpg", "lava.png", "crate.png", "stone.jpg", "snow.jpg"];
-        var textures = [];
 
         for (var i = 0; i < texName.length; i++) {
             var fTex = new THREE.ImageUtils.loadTexture("textures/" + texName[i]);
@@ -99,82 +117,26 @@ $(function(){
             var tex = new THREE.MeshBasicMaterial( { map: fTex } )
             textures.push(tex);
         };
+    }
 
-        mapSrc = [ "6 6\n" +
-                "0 2 0",
+    this.loadWorld = function(){
+        currentMap = mapSrc[level]
 
-                "1 1 1 5 5 5\n" +
-                "1 1 1 2 3 5\n" +
-                "1 0 0 2 2 2\n" +
-                "1 0 0 2 2 2\n" +
-                "1 0 0 2 2 2\n" +
-                "0 0 0 0 0 0",
-
-                "3 3 9 5 5 5\n" +
-                "3 3 9 9 3 5\n" +
-                "3 9 9 9 9 5\n" +
-                "9 9 4 4 9 9\n" +
-                "9 9 4 4 9 9\n" +
-                "9 9 9 9 9 9",
-
-                "9 9 9 5 5 5\n" +
-                "9 9 9 9 3 3\n" +
-                "9 9 9 9 5 5\n" +
-                "9 9 9 9 9 9\n" +
-                "9 9 4 4 9 9\n" +
-                "9 9 9 9 9 9",
-
-                "9 9 9 5 9 5\n" +
-                "9 9 9 9 9 5\n" +
-                "9 9 9 9 9 5\n" +
-                "9 9 9 9 9 9\n" +
-                "9 9 4 9 9 9\n" +
-                "9 9 9 9 9 9",
-
-                "9 9 9 9 9 9\n" +
-                "9 9 9 9 9 9\n" +
-                "9 9 9 9 9 9\n" +
-                "9 9 9 9 9 9\n" +
-                "9 9 9 9 9 9\n" +
-                "9 9 9 9 9 9",
-
-                "6 6 9 9 9 9\n" +
-                "9 9 9 9 9 9\n" +
-                "9 9 9 9 9 9\n" +
-                "9 9 9 9 6 9\n" +
-                "9 9 9 9 6 6\n" +
-                "9 6 9 9 9 6",
-              ]
-        map = new Array();
-
-        world = new Object();
-        world.y = parseInt(mapSrc.length) - 1;
-        world.x = parseInt(mapSrc[0].match(/\d+/g)[0]);
-        world.z = parseInt(mapSrc[0].match(/\d+/g)[1]);
+        world = Object();
+        world.y = parseInt(currentMap.length) - 1;
+        world.x = parseInt(currentMap[0].match(/\d+/g)[0]);
+        world.z = parseInt(currentMap[0].match(/\d+/g)[1]);
         playerPos = new Object();
-        playerPos = { x: parseInt(mapSrc[0].match(/\d+/g)[2]),
-                      y: parseInt(mapSrc[0].match(/\d+/g)[3]),
-                      z: parseInt(mapSrc[0].match(/\d+/g)[4]) };
-
-        playerMax = new Object();
-        playerMax.move = 1;
-        playerMax.jump = 1;
-
-        playerStat = new Object();
-        playerStat.jump = 1;
-        playerStat.move = 1;
-        playerStat.jumpEn = false;
+        playerPos = { x: parseInt(currentMap[0].match(/\d+/g)[2]),
+                      y: parseInt(currentMap[0].match(/\d+/g)[3]),
+                      z: parseInt(currentMap[0].match(/\d+/g)[4]) };
 
         var Box_geometry = new THREE.BoxGeometry( 1, 1, 1 );
         var type;
-
         for (var y = 0; y < world.y; y++) {
-            map[y] = new Array();
             for (var z = 0; z < world.x; z++) {
-                map[y][z] = new Array();
                 for (var x = 0; x < world.z; x++) {
-                    type = mapSrc[y+1].match(/\d+/g)[world.x * z + x];
-                    map[y][z][x] = type;
+                    type = currentMap[y+1].match(/\d+/g)[world.x * z + x];
                     if (type == 9) {
                         continue;
                     }
@@ -183,20 +145,9 @@ $(function(){
                 };
             };
         };
-
-        star = new Collectibles(3, 4, 0);
-        star.setTranslation(0, 0.5, 0, 0.02);
-        star.setRotate(0, 1, 0, 0.02);
-        star.loadModel('star', scene);
-
-        player = new Player(3,3,3);
-        scene.add(player.getMeshObject());
-
-        playerAnim = new TWEEN.Tween(player.getMeshObject().possition);
-
     }
 
-    function update(){
+    this.update = function(){
         if(keyboard.pressed("W")){
             player.moveForward();
         }
@@ -216,78 +167,77 @@ $(function(){
             $(".gameControl").show();
             $(".gameContent").hide();
         }
-
         var delta = clock.getDelta();
-        animatedLava.update(1000 * delta);
++       animatedLava.update(1000 * delta);
+
         player.update();
-        player.collisionBonus(starList);
-        player.collision(blockList);
+        player.collisionBonus(Collectibles.starList);
+        player.collision(Block.blocklist);
         /*camera.lookAt(player.getMeshObject().position);
         camera.position.x = player.x;
         camera.position.y = player.y+2;
         camera.position.z = player.z+5*/
-
-        if (star.isLoaded()) {
-            star.update();
+        for (var i = 0; i < Collectibles.starList.length; i++) {
+            star = Collectibles.starList[i]
+            if (star.isLoaded()) {
+                star.update();
+            }
         }
+
     }
 
-    function render() {}
+    this.render = function() {}
 
-    function animate(){
-        requestAnimationFrame(animate);
-        update();
-        TWEEN.update();
+    this.animate = function(){
+        requestAnimationFrame(this.animate.bind(this));
+        this.update();
 
         camera.lookAt(player.getMeshObject().position);
-        render();
+        this.render();
 
         renderer.render(scene, camera);
     }
 
-    init();
-    setScene();
+    TextureAnimator = function(texture, tilesHoriz, tilesVert, numTiles, tileDispDuration){
+    	this.tilesHorizontal = tilesHoriz;
+    	this.tilesVertical = tilesVert;
+    	// how many images does this spritesheet contain?
+    	//  usually equals tilesHoriz * tilesVert, but not necessarily,
+    	//  if there at blank tiles at the bottom of the spritesheet.
+    	this.numberOfTiles = numTiles;
+    	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    	texture.repeat.set( 1 / this.tilesHorizontal, 1 / this.tilesVertical );
 
-    animate();
+    	// how long should each image be displayed?
+    	this.tileDisplayDuration = tileDispDuration;
 
-    function TextureAnimator(texture, tilesHoriz, tilesVert, numTiles, tileDispDuration)
-{
-	// note: texture passed by reference, will be updated by the update function.
+    	// how long has the current image been displayed?
+    	this.currentDisplayTime = 0;
 
-	this.tilesHorizontal = tilesHoriz;
-	this.tilesVertical = tilesVert;
-	// how many images does this spritesheet contain?
-	//  usually equals tilesHoriz * tilesVert, but not necessarily,
-	//  if there at blank tiles at the bottom of the spritesheet.
-	this.numberOfTiles = numTiles;
-	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-	texture.repeat.set( 1 / this.tilesHorizontal, 1 / this.tilesVertical );
+    	// which image is currently being displayed?
+    	this.currentTile = 0;
 
-	// how long should each image be displayed?
-	this.tileDisplayDuration = tileDispDuration;
+    	this.update = function( milliSec )
+    	{
+    		this.currentDisplayTime += milliSec;
+    		while (this.currentDisplayTime > this.tileDisplayDuration)
+    		{
+    			this.currentDisplayTime -= this.tileDisplayDuration;
+    			this.currentTile++;
+    			if (this.currentTile == this.numberOfTiles)
+    				this.currentTile = 0;
+    			var currentColumn = this.currentTile % this.tilesHorizontal;
+    			texture.offset.x = currentColumn / this.tilesHorizontal;
+    			var currentRow = Math.floor( this.currentTile / this.tilesHorizontal );
+    			texture.offset.y = currentRow / this.tilesVertical;
+    		}
+    	};
+    }
 
-	// how long has the current image been displayed?
-	this.currentDisplayTime = 0;
+    this.init();
+    this.setScene();
 
-	// which image is currently being displayed?
-	this.currentTile = 0;
-
-	this.update = function( milliSec )
-	{
-		this.currentDisplayTime += milliSec;
-		while (this.currentDisplayTime > this.tileDisplayDuration)
-		{
-			this.currentDisplayTime -= this.tileDisplayDuration;
-			this.currentTile++;
-			if (this.currentTile == this.numberOfTiles)
-				this.currentTile = 0;
-			var currentColumn = this.currentTile % this.tilesHorizontal;
-			texture.offset.x = currentColumn / this.tilesHorizontal;
-			var currentRow = Math.floor( this.currentTile / this.tilesHorizontal );
-			texture.offset.y = currentRow / this.tilesVertical;
-		}
-	};
-}
+    this.animate();
 
     $(window).resize(function(){
         SCREEN_WIDTH = window.innerWidth;
@@ -296,6 +246,10 @@ $(function(){
         camera.updateProjectionMatrix();
         renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
     });
+
+}
+
+function initControlMenu(){
     $("#startGame").click(function(){
         console.log("start");
         $(".gameControl").fadeOut("slow", function(){
@@ -334,4 +288,11 @@ $(function(){
             $("#options").fadeIn("slow");
         });
     });
+}
+
+$(document).ready(function(){
+
+    initControlMenu();
+
+    game = new Game();
 });

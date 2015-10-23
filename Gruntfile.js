@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 grunt.initConfig({
   concat: {
     jsfiles: {
-      src: ['js/player.js', 'js/collectibles.js', 'js/main.js', 'js/block.js'],
+      src: ['js/player.js', 'js/collectibles.js', 'js/main.js', 'js/block.js','js/map.js'],
       dest: 'dist/built.js',
     },
   },
