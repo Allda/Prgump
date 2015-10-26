@@ -15,6 +15,9 @@ function Game(){
     var textures = [];
 
     var world, playerPos;
+    var cameraOffsetX = 0;
+    var cameraOffsetZ = 5;
+    var cameraRotationAngle = 0;
 
     this.init = function(){
         /*Creates empty scene object and renderer*/
@@ -32,7 +35,10 @@ function Game(){
         controls.addEventListener( 'change', this.render );
 
         /*Add keyboard catch*/
-        keyboard = new THREEx.KeyboardState();
+        //keyboard = new THREEx.KeyboardState();
+        kd.run(function () {
+            kd.tick();
+        });
 
         /*Camera*/
         camera.position.x = 2;
@@ -147,8 +153,51 @@ function Game(){
         };
     }
 
+    this.cameraNextStep = function(){
+        if(cameraOffsetX == 0 && cameraOffsetZ == 5){
+            cameraOffsetX = -5;
+            cameraOffsetZ = 0;
+            cameraRotationAngle = 90;
+        }
+        else if(cameraOffsetX == -5 && cameraOffsetZ == 0){
+            cameraOffsetX = 0;
+            cameraOffsetZ = -5;
+            cameraRotationAngle = 180
+        }
+        else if(cameraOffsetX == 0 && cameraOffsetZ == -5){
+            cameraOffsetX = 5;
+            cameraOffsetZ = 0;
+            cameraRotationAngle = 270;
+        }
+        else if(cameraOffsetX == 5 && cameraOffsetZ == 0){
+            cameraOffsetX = 0;
+            cameraOffsetZ = 5;
+            cameraRotationAngle = 0;
+        }
+    }
+
+    kd.W.down(function (){
+        player.moveForward(cameraRotationAngle);
+    });
+    kd.S.down(function (){
+        player.moveBackward(cameraRotationAngle);
+    });
+    kd.A.down(function (){
+        player.moveLeft(cameraRotationAngle);
+    });
+    kd.D.down(function (){
+        player.moveRight(cameraRotationAngle);
+    });
+    kd.SPACE.press(function(){
+        player.jump();
+    })
+
+    kd.P.press(function(){
+        game.cameraNextStep();
+    });
     this.update = function(){
-        if(keyboard.pressed("W")){
+
+        /*if(keyboard.pressed("W")){
             player.moveForward();
         }
         if(keyboard.pressed("S")){
@@ -163,20 +212,27 @@ function Game(){
         if(keyboard.pressed("space")){
             player.jump();
         }
+        if(keyboard.pressed("P") && cameraUpdate == false){
+            this.cameraNextStep();
+            cameraUpdate = true;
+        }
+        else{
+            cameraUpdate = false;
+        }
         if(keyboard.pressed("esc")){
             $(".gameControl").show();
             $(".gameContent").hide();
-        }
+        }*/
         var delta = clock.getDelta();
 +       animatedLava.update(1000 * delta);
 
         player.update();
         player.collisionBonus(Collectibles.starList);
         player.collision(Block.blocklist);
-        /*camera.lookAt(player.getMeshObject().position);
-        camera.position.x = player.x;
-        camera.position.y = player.y+2;
-        camera.position.z = player.z+5*/
+        //camera.lookAt(player.getMeshObject().position);
+        camera.position.x = player.x + cameraOffsetX
+        camera.position.y = player.y+3;
+        camera.position.z = player.z+ cameraOffsetZ
         for (var i = 0; i < Collectibles.starList.length; i++) {
             star = Collectibles.starList[i]
             if (star.isLoaded()) {
@@ -190,9 +246,9 @@ function Game(){
 
     this.animate = function(){
         requestAnimationFrame(this.animate.bind(this));
+        camera.lookAt(player.getMeshObject().position);
         this.update();
 
-        camera.lookAt(player.getMeshObject().position);
         this.render();
 
         renderer.render(scene, camera);

@@ -10,7 +10,7 @@ function Player(x,y,z){
     this.sphere.position.y = y;
     this.sphere.position.z = z;
 
-    this.gravity = 0.01;
+    this.gravity = 0.03;
     this.vy = 0.0;
     this.falling = true;
     this.floorCollision = false;
@@ -25,7 +25,7 @@ function Player(x,y,z){
     }
 
     this.jump = function(){
-        this.vy = 0.5;
+        this.vy = 0.3;
     }
 
     this.update = function(){
@@ -44,24 +44,80 @@ function Player(x,y,z){
         this.sphere.position.z = this.z;
     }
 
-    this.moveLeft = function(){
-        this.x -= this.velocity;
-        this.leftFlag = true;
+    this.moveLeft = function(cameraRotationAngle){
+        if(cameraRotationAngle == 0){
+            this.x -= this.velocity;
+            this.leftFlag = true;
+        }
+        else if (cameraRotationAngle == 90) {
+            this.z -= this.velocity;
+            this.forwardFlag = true;
+        }
+        else if (cameraRotationAngle == 180) {
+            this.x += this.velocity;
+            this.rightFlag = true;
+        }
+        else if (cameraRotationAngle == 270) {
+            this.z += this.velocity;
+            this.backwardFlag = true;
+        }
     }
 
-    this.moveRight = function(){
-        this.x += this.velocity;
-        this.rightFlag = true;
+    this.moveRight = function(cameraRotationAngle){
+        if(cameraRotationAngle == 0){
+            this.x += this.velocity;
+            this.rightFlag = true;
+        }
+        else if (cameraRotationAngle == 90) {
+            this.z += this.velocity;
+            this.backwardFlag = true;
+        }
+        else if (cameraRotationAngle == 180) {
+            this.x -= this.velocity;
+            this.leftFlag = true;
+        }
+        else if (cameraRotationAngle == 270) {
+            this.z -= this.velocity;
+            this.forwardFlag = true;
+        }
     }
 
-    this.moveForward = function(){
-        this.z -= this.velocity;
-        this.forwardFlag = true;
+    this.moveForward = function(cameraRotationAngle){
+        if(cameraRotationAngle == 0){
+            this.z -= this.velocity;
+            this.forwardFlag = true;
+        }
+        else if (cameraRotationAngle == 90) {
+            this.x += this.velocity;
+            this.rightFlag = true;
+        }
+        else if (cameraRotationAngle == 180) {
+            this.z += this.velocity;
+            this.backwardFlag = true;
+        }
+        else if (cameraRotationAngle == 270) {
+            this.x -= this.velocity;
+            this.leftFlag = true;
+        }
     }
 
-    this.moveBackward = function(){
-        this.z += this.velocity;
-        this.backwardFlag = true;
+    this.moveBackward = function(cameraRotationAngle){
+        if(cameraRotationAngle == 0){
+            this.z += this.velocity;
+            this.backwardFlag = true;
+        }
+        else if (cameraRotationAngle == 90) {
+            this.x -= this.velocity;
+            this.leftFlag = true;
+        }
+        else if (cameraRotationAngle == 180) {
+            this.z -= this.velocity;
+            this.forwardFlag = true;
+        }
+        else if (cameraRotationAngle == 270) {
+            this.x += this.velocity;
+            this.rightFlag = true;
+        }
     }
 
     this.resetFlags = function(){
