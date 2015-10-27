@@ -198,7 +198,7 @@ function Player(x,y,z){
     }
 
 
-    this.collisionBonus = function(bonusList){
+    this.collisionBonus = function(bonusList, scene){
         for (var i = 0; i < bonusList.length; i++) {
             object = bonusList[i];
             objectMesh = object.getMeshObject();
@@ -223,6 +223,7 @@ function Player(x,y,z){
                 if(zStart < objectZEnd && zEnd > objectZStart){
                     if(yStart < objectYEnd && yEnd > objectYStart){
                         console.log("collision");
+                        object.dismiss();
                     }
                 }
             }

@@ -63,6 +63,11 @@ function Game(){
 
         player = new Player(3,3,3);
         scene.add(player.getMeshObject());
+
+        var start = new model3D(-2,2,0);
+        start.loadModel("start", scene);
+        var start2 = new model3D(-2,3,0);
+        start2.loadModel("goal", scene);
     }
 
     this.initCollectibles = function(){
@@ -260,7 +265,11 @@ function Game(){
         for (var i = 0; i < Collectibles.starList.length; i++) {
             star = Collectibles.starList[i]
             if (star.isLoaded()) {
-                star.update();
+                if (star.isPicked()) {
+                    star.ending(Collectibles.starList ,scene);
+                } else {
+                    star.update();
+                }
             }
         }
 

@@ -11,6 +11,7 @@ function Collectibles(x,y,z) {
 
     var model;
     var loaded = false;
+    var picked = false;
 
     this.getMeshObject = function() {
         return model;
@@ -18,6 +19,15 @@ function Collectibles(x,y,z) {
 
     this.isLoaded = function() {
         return loaded;
+    }
+
+    this.isPicked = function() {
+        return picked;
+    }
+
+    this.dismiss = function(scene) {
+        picked = true;
+        model.children[1].material.transparent = true
     }
 
     this.loadModel = function(modelName, scene) {
@@ -90,6 +100,19 @@ function Collectibles(x,y,z) {
                 model.position.y += dest.y*speedTrans;
                 model.position.z += dest.z*speedTrans;
             }
+        }
+    }
+
+    this.ending = function(bonusList, scene) {
+        model.rotateOnAxis(rotate,speedRotate);
+        model.position.x += dest.x*speedTrans*2;
+        model.position.y += dest.y*speedTrans*2;
+        model.position.z += dest.z*speedTrans*2;
+        model.children[1].material.opacity -= 0.025;
+        if (model.children[1].material.opacity <= 0.0) {
+            model.renderOrder = 1;
+            scene.remove(model);
+            bonusList.splice(i,1);
         }
     }
 
