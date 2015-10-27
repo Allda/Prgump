@@ -19,6 +19,9 @@ function Game(){
     var cameraOffsetZ = 5;
     var cameraRotationAngle = 0;
 
+    var listener;
+    var soundAmb;
+
     this.init = function(){
         /*Creates empty scene object and renderer*/
         scene = new THREE.Scene();
@@ -56,6 +59,7 @@ function Game(){
         this.loadWorld();
 
         this.initCollectibles();
+        this.initAudio();
 
         player = new Player(3,3,3);
         scene.add(player.getMeshObject());
@@ -66,6 +70,15 @@ function Game(){
         star.setTranslation(0, 0.5, 0, 0.02);
         star.setRotate(0, 1, 0, 0.02);
         star.loadModel('star', scene);
+    }
+
+    this.initAudio = function() {
+        listener = new THREE.AudioListener();
+        soundAmb = new THREE.Audio( listener );
+        soundAmb.load( 'sounds/Ambient.ogg' );
+        soundAmb.setVolume(0.05);
+        soundAmb.setLoop(true);
+        soundAmb.play();
     }
 
     this.initLight = function(help){
@@ -113,14 +126,25 @@ function Game(){
     }
 
     this.loadTextures = function(){
-        var texName = ["floor.png", "water.jpg", "grass.jpg", "lava.png", "crate.png", "stone.jpg", "snow.jpg"];
+        var texName = [["floor.png","floor.png"],
+                       ["water.jpg","water.jpg"],
+                       ["grass.jpg","grass-mud.jpg"],
+                       ["lava.png","lava.png"],
+                       ["crate.png","crate.png"],
+                       ["stone.jpg","stone.jpg"],
+                       ["snow.jpg","snow.jpg"]];
 
         for (var i = 0; i < texName.length; i++) {
-            var fTex = new THREE.ImageUtils.loadTexture("textures/" + texName[i]);
-            if(texName[i] == "lava.png"){
-                animatedLava = new TextureAnimator( fTex, 3, 3, 9, 120 ); // texture, #horiz, #vert, #total, duration.
+
+            var tex = loadMultiTexture("textures/",texName[i][0],texName[i][1]);
+            if(texName[i][0] == "lava.png"){
+                tex = new THREE.ImageUtils.loadTexture("textures/" + texName[i][0]);
+                animatedLava = new TextureAnimator( tex, 3, 3, 9, 120 ); // texture, #horiz, #vert, #total, duration.
+                tex = new THREE.MeshBasicMaterial( { map: tex } )
+                textures.push(tex);
+                continue;
             }
-            var tex = new THREE.MeshBasicMaterial( { map: fTex } )
+
             textures.push(tex);
         };
     }

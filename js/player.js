@@ -20,12 +20,17 @@ function Player(x,y,z){
     this.forwardFlag = false;
     this.backwardFlag = false;
 
+    this.listener = new THREE.AudioListener();
+    this.soundJump = new THREE.Audio( this.listener );
+    this.soundJump.load( 'sounds/jump.ogg' );
+
     this.getMeshObject = function(){
         return this.sphere;
     }
 
     this.jump = function(){
         this.vy = 0.3;
+        this.soundJump.play();
     }
 
     this.update = function(){
