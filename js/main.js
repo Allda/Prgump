@@ -64,9 +64,9 @@ function Game(){
         player = new Player(3,3,3);
         scene.add(player.getMeshObject());
 
-        var start = new model3D(-2,2,0);
-        start.loadModel("star", scene);
-        var start2 = new model3D(-2,3,0);
+        var start = new model3D(0,1.4,0);
+        start.loadModel("start", scene);
+        var start2 = new model3D(2,3.4,4);
         start2.loadModel("goal", scene);
     }
 
