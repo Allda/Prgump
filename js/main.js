@@ -65,7 +65,7 @@ function Game(){
         scene.add(player.getMeshObject());
 
         var start = new model3D(-2,2,0);
-        start.loadModel("start", scene);
+        start.loadModel("star", scene);
         var start2 = new model3D(-2,3,0);
         start2.loadModel("goal", scene);
     }
@@ -80,10 +80,10 @@ function Game(){
     this.initAudio = function() {
         listener = new THREE.AudioListener();
         soundAmb = new THREE.Audio( listener );
-        soundAmb.load( 'sounds/Ambient.ogg' );
+        soundAmb.autoplay = true;
         soundAmb.setVolume(0.05);
         soundAmb.setLoop(true);
-        soundAmb.play();
+        soundAmb.load( 'sounds/Ambient.ogg' );
     }
 
     this.initLight = function(help){
