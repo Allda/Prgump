@@ -10,7 +10,7 @@ function Game(){
     var spotLight, cube, sphere;
     var SCREEN_WIDTH, SCREEN_HEIGHT;
 
-    var animatedLava;
+    var animatedLava, animatedWater;
     var clock = new THREE.Clock();
     var textures = [];
 
@@ -131,13 +131,13 @@ function Game(){
     }
 
     this.loadTextures = function(){
-        var texName = [["floor.png","floor.png"],
-                       ["water.jpg","water.jpg"],
-                       ["grass.jpg","grass-mud.jpg"],
-                       ["lava.png","lava.png"],
-                       ["crate.png","crate.png"],
-                       ["stone.jpg","stone.jpg"],
-                       ["snow.jpg","snow.jpg"]];
+        var texName = [["floor.png","floor.png","floor.png"],
+                       ["water.jpg","water.jpg","water.jpg"],
+                       ["grass.jpg","grass-mud.jpg","mud.jpg"],
+                       ["lava.png","lava.png","lava.png"],
+                       ["crate.png","crate.png","crate.png"],
+                       ["stone.jpg","stone.jpg","stone.jpg"],
+                       ["snow.jpg","snow.jpg","snow.jpg"]];
 
         for (var i = 0; i < texName.length; i++) {
 
@@ -145,6 +145,12 @@ function Game(){
             if(texName[i][0] == "lava.png"){
                 tex = new THREE.ImageUtils.loadTexture("textures/" + texName[i][0]);
                 animatedLava = new TextureAnimator( tex, 3, 3, 9, 120 ); // texture, #horiz, #vert, #total, duration.
+                tex = new THREE.MeshBasicMaterial( { map: tex } )
+                textures.push(tex);
+                continue;
+            } else if(texName[i][0] == "water.jpg"){
+                tex = new THREE.ImageUtils.loadTexture("textures/" + texName[i][0]);
+                animatedWater = new TextureAnimator( tex, 16, 1, 16, 1600 ); // texture, #horiz, #vert, #total, duration.
                 tex = new THREE.MeshBasicMaterial( { map: tex } )
                 textures.push(tex);
                 continue;
@@ -253,7 +259,8 @@ function Game(){
             $(".gameContent").hide();
         }*/
         var delta = clock.getDelta();
-+       animatedLava.update(1000 * delta);
+        animatedLava.update(1000 * delta);
+        animatedWater.update(16000 * delta);
 
         player.update();
         player.collisionBonus(Collectibles.starList);

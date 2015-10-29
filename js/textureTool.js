@@ -1,6 +1,6 @@
-function loadMultiTexture(prefix, up, sides) {
+function loadMultiTexture(prefix, up, sides, down) {
     var urls = [ prefix + sides, prefix + sides,
-    prefix + up, prefix + sides,
+    prefix + up, prefix + down,
     prefix + sides, prefix + sides ];
     var materialArray = [];
     for (var i = 0; i < 6; i++)
