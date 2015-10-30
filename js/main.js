@@ -9,7 +9,7 @@ function Game(){
     var stats;
     var spotLight, cube, sphere;
     var SCREEN_WIDTH, SCREEN_HEIGHT;
-
+    // GIFs
     var animatedLava, animatedWater;
     var clock = new THREE.Clock();
     var textures = [];
@@ -18,9 +18,12 @@ function Game(){
     var cameraOffsetX = 0;
     var cameraOffsetZ = 5;
     var cameraRotationAngle = 0;
-
+    // Ambient sound
     var listener;
     var soundAmb;
+    // Particles
+    var emitter;
+    var groupEmitter;
 
     this.init = function(){
         /*Creates empty scene object and renderer*/
@@ -63,6 +66,7 @@ function Game(){
 
         player = new Player(3,3,3);
         scene.add(player.getMeshObject());
+        scene.add(player.getBurningMesh());
 
         var start = new model3D(0,1.4,0);
         start.loadModel("start", scene);
@@ -181,7 +185,7 @@ function Game(){
                     if (type == 9) {
                         continue;
                     }
-                    var block = new Block(x, y, z, textures[type]);
+                    var block = new Block(x, y, z, type, textures[type]);
                     scene.add(block.getMeshObject());
                 };
             };
@@ -212,24 +216,34 @@ function Game(){
     }
 
     kd.W.down(function (){
-        player.moveForward(cameraRotationAngle);
+        if(!player.isDrowning()) {
+            player.moveForward(cameraRotationAngle);
+        }
     });
     kd.S.down(function (){
-        player.moveBackward(cameraRotationAngle);
+        if(!player.isDrowning()) {
+            player.moveBackward(cameraRotationAngle);
+        }
     });
     kd.A.down(function (){
-        player.moveLeft(cameraRotationAngle);
+        if(!player.isDrowning()) {
+            player.moveLeft(cameraRotationAngle);
+        }
     });
     kd.D.down(function (){
-        player.moveRight(cameraRotationAngle);
+        if(!player.isDrowning()) {
+            player.moveRight(cameraRotationAngle);
+        }
     });
     kd.SPACE.press(function(){
-        player.jump();
+        if(!player.isDrowning()) {
+            player.jump();
+        }
     })
-
     kd.P.press(function(){
         game.cameraNextStep();
     });
+
     this.update = function(){
 
         /*if(keyboard.pressed("W")){
@@ -262,9 +276,12 @@ function Game(){
         animatedLava.update(1000 * delta);
         animatedWater.update(16000 * delta);
 
-        player.update();
-        player.collisionBonus(Collectibles.starList);
-        player.collision(Block.blocklist);
+        player.update(delta);
+        if (!player.isDrowning()) {
+            player.collisionBonus(Collectibles.starList);
+            player.collision(Block.blocklist);
+        }
+
         //camera.lookAt(player.getMeshObject().position);
         camera.position.x = player.x + cameraOffsetX
         camera.position.y = player.y+3;

@@ -3,12 +3,15 @@ function Player(x,y,z){
     this.y = y;
     this.z = z;
 
-    this.geometry = new THREE.SphereGeometry( 0.5, 16, 16 );
-    this.material = new THREE.MeshBasicMaterial( {color: 0xff66ff} );
+    this.geometry = new THREE.SphereGeometry( 0.25, 16, 16 );
+    this.material = new THREE.MeshLambertMaterial( {color: 0xff66ff} );
     this.sphere = new THREE.Mesh( this.geometry, this.material );
     this.sphere.position.x = x;
     this.sphere.position.y = y;
     this.sphere.position.z = z;
+    this.sphere.radius = 0.25;
+    this.castShadow = true;
+    this.receiveShadow = true;
 
     this.gravity = 0.03;
     this.vy = 0.0;
@@ -20,9 +23,45 @@ function Player(x,y,z){
     this.forwardFlag = false;
     this.backwardFlag = false;
 
+    this.drownPosY;
+    this.drowning = false;
+    this.burning = false;
+    this.dead = false;
+
     this.listener = new THREE.AudioListener();
     this.soundJump = new THREE.Audio( this.listener );
     this.soundJump.load( 'sounds/jump.ogg' );
+
+    this.emitter = new SPE.Emitter( {
+        particleCount: 1,
+        type: SPE.distributions.SPHERE,
+        position: {
+            value: new THREE.Vector3(0,0.45,0),
+            radius: 0.0
+        },
+        maxAge: { value: 1 },
+        size: { value: [12, 12] },
+    });
+    this.groupEmitter = new SPE.Group( {
+        texture: {
+            value: THREE.ImageUtils.loadTexture( './textures/fire.jpg' ),
+            frames: new THREE.Vector2( 6, 6 ),
+            frameCount: 36,
+            loop: 1
+        },
+        depthTest: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        scale: 45
+    });
+    this.groupEmitter.addEmitter(this.emitter);
+    this.groupEmitter.mesh.castShadow = true;
+    this.groupEmitter.mesh.receiveShadow = true;
+    this.emitter.disable();
+
+    this.getBurningMesh = function() {
+        return this.groupEmitter.mesh;
+    }
 
     this.getMeshObject = function(){
         return this.sphere;
@@ -33,12 +72,29 @@ function Player(x,y,z){
         this.soundJump.play();
     }
 
-    this.update = function(){
+    this.isDrowning = function() {
+        return this.drowning;
+    }
 
+    this.isBurning = function() {
+        return this.burn;
+    }
+
+    this.update = function(delta){
         this.y += this.vy;
-        if(this.falling){
-            this.vy -= this. gravity;
-
+        if(this.drowning) {
+            if((this.drownPosY-this.y) >= 1.0) {
+                this.vy = 0.0;
+                this.dead = true;
+            }
+        } else if(this.falling){
+            this.vy -= this.gravity;
+        }
+        if(this.burning) {
+            this.groupEmitter.mesh.position.x = this.x;
+            this.groupEmitter.mesh.position.y = this.y;
+            this.groupEmitter.mesh.position.z = this.z;
+            this.groupEmitter.tick(delta);
         }
         this.updateMesh();
     }
@@ -153,10 +209,49 @@ function Player(x,y,z){
             var objectZStart = object.position.z - object.scale.z/2;
             var objectZEnd = object.position.z + object.scale.z/2;
 
+            var xStartPl = this.x - this.sphere.radius;
+            var xEndPl = this.x + this.sphere.radius;
+
+            var yStartPl = this.y - this.sphere.radius;
+
+            var zStartPl = this.z - this.sphere.radius;
+            var zEndPl = this.z + this.sphere.radius;
+
+            if(xStartPl > objectXStart && xEndPl < objectXEnd){
+                if(zStartPl > objectZStart && zEndPl < objectZEnd){
+                    if((yStartPl-objectYEnd) <= 0.25){
+                        if(object.type == 1) {
+                            this.vy = -0.015;
+                            this.drownPosY = this.y;
+                            this.drowning = true;
+                            break;
+                        } /*else if((object.type == 3) && !this.burning) {
+                           this.burning = true;
+                           this.emitter.enable();
+                           this.groupEmitter.mesh.visible = true;
+                       }*/
+                    }
+                }
+            }
+
             if(xStart < objectXEnd && xEnd > objectXStart){
                 if(zStart < objectZEnd && zEnd > objectZStart){
                     if(yStart < objectYEnd && yEnd > objectYStart){
                         flag = true;
+
+                        if(object.type == 1) {
+                            if(this.burning) {
+                                this.burning = false;
+                                this.emitter.disable();
+                                this.groupEmitter.mesh.visible = false;
+                            }
+                        }
+                        if((object.type == 3) && !this.burning) {
+                           this.burning = true;
+                           this.emitter.enable();
+                           this.groupEmitter.mesh.visible = true;
+                        }
+
                         if(!this.floorCollision){
                             if(this.vy <= 0){
                                 this.y = objectYEnd + this.sphere.scale.y/2-0.01;
@@ -229,5 +324,4 @@ function Player(x,y,z){
             }
         }
     }
-
 }
