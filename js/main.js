@@ -64,7 +64,7 @@ function Game(){
         this.initCollectibles();
         this.initAudio();
 
-        player = new Player(3,3,3);
+        player = new Player(1,1.1,3);
         scene.add(player.getMeshObject());
         scene.add(player.getBurningMesh());
 
@@ -216,23 +216,59 @@ function Game(){
     }
 
     kd.W.down(function (){
-        if(!player.isDrowning()) {
-            player.moveForward(cameraRotationAngle);
+        if(cameraRotationAngle == 0){
+            player.moveForward();
+        }
+        else if (cameraRotationAngle == 90) {
+            player.moveRight();
+        }
+        else if (cameraRotationAngle == 180) {
+            player.moveBackward();
+        }
+        else if (cameraRotationAngle == 270) {
+            player.moveLeft();
         }
     });
     kd.S.down(function (){
-        if(!player.isDrowning()) {
-            player.moveBackward(cameraRotationAngle);
+        if(cameraRotationAngle == 0){
+            player.moveBackward();
+        }
+        else if (cameraRotationAngle == 90) {
+            player.moveLeft();
+        }
+        else if (cameraRotationAngle == 180) {
+            player.moveForward();
+        }
+        else if (cameraRotationAngle == 270) {
+            player.moveRight();
         }
     });
     kd.A.down(function (){
-        if(!player.isDrowning()) {
-            player.moveLeft(cameraRotationAngle);
+        if(cameraRotationAngle == 0){
+            player.moveLeft();
+        }
+        else if (cameraRotationAngle == 90) {
+            player.moveForward();
+        }
+        else if (cameraRotationAngle == 180) {
+            player.moveRight();
+        }
+        else if (cameraRotationAngle == 270) {
+            player.moveBackward();
         }
     });
     kd.D.down(function (){
-        if(!player.isDrowning()) {
-            player.moveRight(cameraRotationAngle);
+        if(cameraRotationAngle == 0){
+            player.moveRight();
+        }
+        else if (cameraRotationAngle == 90) {
+            player.moveBackward();
+        }
+        else if (cameraRotationAngle == 180) {
+            player.moveLeft();
+        }
+        else if (cameraRotationAngle == 270) {
+            player.moveForward();
         }
     });
     kd.SPACE.press(function(){
@@ -279,7 +315,6 @@ function Game(){
         player.update(delta);
         if (!player.isDrowning()) {
             player.collisionBonus(Collectibles.starList);
-            player.collision(Block.blocklist);
         }
 
         //camera.lookAt(player.getMeshObject().position);

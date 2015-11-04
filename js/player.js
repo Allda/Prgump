@@ -9,11 +9,11 @@ function Player(x,y,z){
     this.sphere.position.x = x;
     this.sphere.position.y = y;
     this.sphere.position.z = z;
-    this.sphere.radius = 0.25;
-    this.castShadow = true;
-    this.receiveShadow = true;
+    this.radius = 0.3;
+    this.sphere.castShadow = true;
+    this.sphere.receiveShadow = true;
 
-    this.gravity = 0.03;
+    this.gravity = 0.031;
     this.vy = 0.0;
     this.falling = true;
     this.floorCollision = false;
@@ -81,7 +81,37 @@ function Player(x,y,z){
     }
 
     this.update = function(delta){
+        var oldY = this.y;
         this.y += this.vy;
+        var collisionObject = this.isCollision(Block.blocklist);
+        var floorTouch = false;
+        if(collisionObject != null){
+            if(this.vy > 0){ // moving up.. ceiling collision
+                var possibleMove = (collisionObject.position.y - collisionObject.scale.y/2) - (oldY + this.radius);
+                if(possibleMove < 0.05)
+                    this.y = oldY;
+                else
+                    this.y = oldY + possibleMove - 0.01;
+                this.vy = 0;
+                this.vy -= this.gravity;
+            }
+            else if(this.vy <= 0) { // moving down.. floor collision
+                var possibleMove = (oldY - this.radius) - (collisionObject.position.y + collisionObject.scale.y/2);
+                console.log(possibleMove, oldY, this.y);
+                if(possibleMove < 0.05)
+                    this.y = oldY;
+                else{
+                    this.y = oldY - possibleMove + 0.01;
+                }
+                this.vy = 0;
+                floorTouch = true;
+            }
+        }
+        else{
+            if(!floorTouch)
+                this.vy -= this.gravity;
+        }
+        /*this.y += this.vy;
         if(this.drowning) {
             if((this.drownPosY-this.y) >= 1.0) {
                 this.vy = 0.0;
@@ -95,7 +125,7 @@ function Player(x,y,z){
             this.groupEmitter.mesh.position.y = this.y;
             this.groupEmitter.mesh.position.z = this.z;
             this.groupEmitter.tick(delta);
-        }
+        }*/
         this.updateMesh();
     }
 
@@ -106,79 +136,67 @@ function Player(x,y,z){
     }
 
     this.moveLeft = function(cameraRotationAngle){
-        if(cameraRotationAngle == 0){
+        if(!this.isDrowning()){
+            var oldX = this.x;
             this.x -= this.velocity;
-            this.leftFlag = true;
+            var collisionObject = this.isCollision(Block.blocklist);
+            if(collisionObject != null){
+                var possibleMove = oldX - this.radius - (collisionObject.position.x + collisionObject.scale.x/2);
+                if(possibleMove < 0.05)
+                    this.x = oldX;
+                else
+                    this.x = oldX - possibleMove+0.01;
+            }
         }
-        else if (cameraRotationAngle == 90) {
-            this.z -= this.velocity;
-            this.forwardFlag = true;
-        }
-        else if (cameraRotationAngle == 180) {
-            this.x += this.velocity;
-            this.rightFlag = true;
-        }
-        else if (cameraRotationAngle == 270) {
-            this.z += this.velocity;
-            this.backwardFlag = true;
-        }
+        this.updateMesh();
     }
 
     this.moveRight = function(cameraRotationAngle){
-        if(cameraRotationAngle == 0){
+        if(!this.isDrowning()){
+            var oldX = this.x;
             this.x += this.velocity;
-            this.rightFlag = true;
+            var collisionObject = this.isCollision(Block.blocklist);
+            if(collisionObject != null){
+                var possibleMove = (collisionObject.position.x - collisionObject.scale.x/2) - (oldX + this.radius);
+                if(possibleMove < 0.05)
+                    this.x = oldX;
+                else
+                    this.x = oldX +possibleMove-0.01;
+            }
         }
-        else if (cameraRotationAngle == 90) {
-            this.z += this.velocity;
-            this.backwardFlag = true;
-        }
-        else if (cameraRotationAngle == 180) {
-            this.x -= this.velocity;
-            this.leftFlag = true;
-        }
-        else if (cameraRotationAngle == 270) {
-            this.z -= this.velocity;
-            this.forwardFlag = true;
-        }
+        this.updateMesh();
     }
 
     this.moveForward = function(cameraRotationAngle){
-        if(cameraRotationAngle == 0){
+        if(!this.isDrowning()){
+            var oldZ = this.z;
             this.z -= this.velocity;
-            this.forwardFlag = true;
+            var collisionObject = this.isCollision(Block.blocklist);
+            if(collisionObject != null){
+                var possibleMove = oldZ - this.radius - (collisionObject.position.z + collisionObject.scale.z/2);
+                if (possibleMove < 0.05)
+                    this.z = oldZ;
+                else
+                    this.z = oldZ - possibleMove +0.01;
+            }
         }
-        else if (cameraRotationAngle == 90) {
-            this.x += this.velocity;
-            this.rightFlag = true;
-        }
-        else if (cameraRotationAngle == 180) {
-            this.z += this.velocity;
-            this.backwardFlag = true;
-        }
-        else if (cameraRotationAngle == 270) {
-            this.x -= this.velocity;
-            this.leftFlag = true;
-        }
+        this.updateMesh();
     }
 
     this.moveBackward = function(cameraRotationAngle){
-        if(cameraRotationAngle == 0){
+        if(!this.isDrowning()){
+            var oldZ = this.z;
             this.z += this.velocity;
-            this.backwardFlag = true;
+            var collisionObject = this.isCollision(Block.blocklist);
+            if(collisionObject != null){
+                var possibleMove = (collisionObject.position.z - collisionObject.scale.z/2) - (oldZ + this.radius);
+                if(possibleMove < 0.05)
+                    this.z = oldZ;
+                else
+                    this.z = oldZ + possibleMove -0.01;
+            }
         }
-        else if (cameraRotationAngle == 90) {
-            this.x -= this.velocity;
-            this.leftFlag = true;
-        }
-        else if (cameraRotationAngle == 180) {
-            this.z -= this.velocity;
-            this.forwardFlag = true;
-        }
-        else if (cameraRotationAngle == 270) {
-            this.x += this.velocity;
-            this.rightFlag = true;
-        }
+
     }
 
     this.resetFlags = function(){
@@ -209,13 +227,13 @@ function Player(x,y,z){
             var objectZStart = object.position.z - object.scale.z/2;
             var objectZEnd = object.position.z + object.scale.z/2;
 
-            var xStartPl = this.x - this.sphere.radius;
-            var xEndPl = this.x + this.sphere.radius;
+            var xStartPl = this.x - this.radiusius;
+            var xEndPl = this.x + this.radius;
 
-            var yStartPl = this.y - this.sphere.radius;
+            var yStartPl = this.y - this.radius;
 
-            var zStartPl = this.z - this.sphere.radius;
-            var zEndPl = this.z + this.sphere.radius;
+            var zStartPl = this.z - this.radius;
+            var zEndPl = this.z + this.radius;
 
             if(xStartPl > objectXStart && xEndPl < objectXEnd){
                 if(zStartPl > objectZStart && zEndPl < objectZEnd){
@@ -323,5 +341,35 @@ function Player(x,y,z){
                 }
             }
         }
+    }
+
+    this.isCollision = function(blockList){
+        for (var i = 0; i < blockList.length; i++) {
+            objectMesh = blockList[i];
+
+            var xStart = this.x - this.radius;
+            var xEnd = this.x + this.radius;
+            var objectXStart = objectMesh.position.x - objectMesh.scale.x/2;
+            var objectXEnd = objectMesh.position.x + objectMesh.scale.x/2;
+
+            var yStart = this.y - this.radius;
+            var yEnd = this.y + this.radius;
+            var objectYStart = objectMesh.position.y - objectMesh.scale.y/2;
+            var objectYEnd = objectMesh.position.y + objectMesh.scale.y/2;
+
+            var zStart = this.z - this.radius;
+            var zEnd = this.z + this.radius;
+            var objectZStart = objectMesh.position.z - objectMesh.scale.z/2;
+            var objectZEnd = objectMesh.position.z + objectMesh.scale.z/2;
+
+            if(xStart < objectXEnd && xEnd > objectXStart){
+                if(zStart < objectZEnd && zEnd > objectZStart){
+                    if(yStart < objectYEnd && yEnd > objectYStart){
+                        return objectMesh;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
