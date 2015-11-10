@@ -1,6 +1,7 @@
 var player;
 var level = "1";
 var keyboard;
+var world;
 
 function Game(){
 
@@ -185,7 +186,7 @@ function Game(){
                     if (type == 9) {
                         continue;
                     }
-                    var block = new Block(x, y, z, type, textures[type]);
+                    var block = new Block(world, x, y, z, type, textures[type]);
                     scene.add(block.getMeshObject());
                 };
             };
@@ -312,7 +313,7 @@ function Game(){
         animatedLava.update(1000 * delta);
         animatedWater.update(16000 * delta);
 
-        player.update(delta);
+        player.update(delta, world);
         if (!player.isDrowning()) {
             player.collisionBonus(Collectibles.starList);
         }

@@ -9,7 +9,7 @@ function Player(x,y,z){
     this.sphere.position.x = x;
     this.sphere.position.y = y;
     this.sphere.position.z = z;
-    this.radius = 0.3;
+    this.radius = 0.25;
     this.sphere.castShadow = true;
     this.sphere.receiveShadow = true;
 
@@ -32,6 +32,7 @@ function Player(x,y,z){
     this.soundJump = new THREE.Audio( this.listener );
     this.soundJump.load( 'sounds/jump.ogg' );
 
+    /* Fire animation */
     this.emitter = new SPE.Emitter( {
         particleCount: 1,
         type: SPE.distributions.SPHERE,
@@ -59,6 +60,8 @@ function Player(x,y,z){
     this.groupEmitter.mesh.receiveShadow = true;
     this.emitter.disable();
 
+    /* Function */
+
     this.getBurningMesh = function() {
         return this.groupEmitter.mesh;
     }
@@ -80,7 +83,7 @@ function Player(x,y,z){
         return this.burn;
     }
 
-    this.update = function(delta){
+    this.update = function(delta, world){
         var oldY = this.y;
         this.y += this.vy;
         var collisionObject = this.isCollision(Block.blocklist);
@@ -94,6 +97,7 @@ function Player(x,y,z){
                     this.y = oldY + possibleMove - 0.01;
                 this.vy = 0;
                 this.vy -= this.gravity;
+                this.checkFire(collisionObject);
             }
             else if(this.vy <= 0) { // moving down.. floor collision
                 var possibleMove = (oldY - this.radius) - (collisionObject.position.y + collisionObject.scale.y/2);
@@ -105,28 +109,112 @@ function Player(x,y,z){
                 }
                 this.vy = 0;
                 floorTouch = true;
+                if ((!this.drowning) && (collisionObject.type == 1)) {
+                    if (this.collisionWater(collisionObject, world)) {
+                        this.checkWater(collisionObject, world);
+                        this.dead = true;
+                    };
+                }
+                this.checkFire(collisionObject);
             }
         }
         else{
             if(!floorTouch)
                 this.vy -= this.gravity;
         }
-        /*this.y += this.vy;
+        /*this.y += this.vy;*/
+
         if(this.drowning) {
-            if((this.drownPosY-this.y) >= 1.0) {
-                this.vy = 0.0;
-                this.dead = true;
+            if((this.drownPosY-this.y) < 0.95) {
+                this.y -= 0.0125;
             }
-        } else if(this.falling){
-            this.vy -= this.gravity;
         }
+
         if(this.burning) {
             this.groupEmitter.mesh.position.x = this.x;
             this.groupEmitter.mesh.position.y = this.y;
             this.groupEmitter.mesh.position.z = this.z;
             this.groupEmitter.tick(delta);
-        }*/
+        }
+
         this.updateMesh();
+    }
+
+    this.collisionWater = function(collisionObject, world) {
+        var center = collisionObject;
+        var left, leftUp, up, rightUp, right, rightDown, down, leftDown;
+
+        if (center.position.x > 0)
+            left = Block.getBlock(center.index-1, 1);
+        if ((center.position.x > 0) && (center.position.z > 0))
+            leftUp = Block.getBlock(center.index-1-world.x, 1);
+        if (center.position.z > 0)
+            up = Block.getBlock(center.index-world.x, 1);
+        if ((center.position.x < world.x) && (center.position.z > 0))
+            rightUp = Block.getBlock(center.index+1-world.x, 1);
+        if (center.position.x < world.x)
+            right = Block.getBlock(center.index+1, 1);
+        if ((center.position.x < world.x) && (center.position.z < world.z))
+            rightDown = Block.getBlock(center.index+1+world.x, 1);
+        if (center.position.z < world.z)
+            down = Block.getBlock(center.index+world.x, 1);
+        if ((center.position.x > 0) && (center.position.z < world.z))
+            leftDown = Block.getBlock(center.index-1+world.x, 1);
+
+        var posX = this.x + this.radius - (center.position.x + center.scale.x/2);
+        var posZ = this.z + this.radius - (center.position.z + center.scale.z/2);
+
+        /* Check center position */
+        if ((posX < 0.0) && (posX > -0.5) &&
+            (posZ < 0.0) && (posZ > -0.5)) {
+            return true;
+        /* Check left corner */
+        } else if ((posX < -0.5) && (posZ > -0.5) &&
+                   (posZ < 0.0)) {
+           if (typeof left != 'undefined') {
+               return true;
+           }
+        /* Check leftUp corner */
+        } else if ((posX < -0.5) && (posZ < -0.5)) {
+            if (typeof leftUp != 'undefined') {
+                return true;
+            }
+        /* Check up corner */
+        } else if ((posZ < -0.5) && (posX > -0.5) &&
+                   (posX < 0.0)) {
+           if (typeof up != 'undefined') {
+               return true;
+           }
+        /* Check rightUp corner */
+        } else if ((posX > 0.0) && (posZ < -0.5)) {
+            if (typeof rightUp != 'undefined') {
+                return true;
+            }
+        /* Check right corner */
+        } else if ((posX > 0.0) && (posZ > -0.5) &&
+                   (posZ < 0.0)) {
+           if (typeof right != 'undefined') {
+               return true;
+           }
+        /* Check rightDown corner */
+        } else if ((posX > 0.0) && (posZ > 0.0)) {
+            if (typeof rightDown != 'undefined') {
+                return true;
+            }
+        /* Check down corner */
+        } else if ((posZ > 0.0) && (posX > -0.5) &&
+                   (posX < 0.0)) {
+           if (typeof down != 'undefined') {
+               return true;
+           }
+        /* Check leftDown corner */
+        } else if ((posX < -0.5) && (posZ > 0.0)) {
+            if (typeof leftDown != 'undefined') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     this.updateMesh = function(){
@@ -142,10 +230,12 @@ function Player(x,y,z){
             var collisionObject = this.isCollision(Block.blocklist);
             if(collisionObject != null){
                 var possibleMove = oldX - this.radius - (collisionObject.position.x + collisionObject.scale.x/2);
-                if(possibleMove < 0.05)
+                if(possibleMove < 0.05) {
                     this.x = oldX;
-                else
+                } else {
                     this.x = oldX - possibleMove+0.01;
+                }
+                this.checkFire(collisionObject);
             }
         }
         this.updateMesh();
@@ -158,10 +248,12 @@ function Player(x,y,z){
             var collisionObject = this.isCollision(Block.blocklist);
             if(collisionObject != null){
                 var possibleMove = (collisionObject.position.x - collisionObject.scale.x/2) - (oldX + this.radius);
-                if(possibleMove < 0.05)
+                if(possibleMove < 0.05) {
                     this.x = oldX;
-                else
+                } else {
                     this.x = oldX +possibleMove-0.01;
+                }
+                this.checkFire(collisionObject);
             }
         }
         this.updateMesh();
@@ -174,10 +266,12 @@ function Player(x,y,z){
             var collisionObject = this.isCollision(Block.blocklist);
             if(collisionObject != null){
                 var possibleMove = oldZ - this.radius - (collisionObject.position.z + collisionObject.scale.z/2);
-                if (possibleMove < 0.05)
+                if (possibleMove < 0.05) {
                     this.z = oldZ;
-                else
+                } else {
                     this.z = oldZ - possibleMove +0.01;
+                }
+                this.checkFire(collisionObject);
             }
         }
         this.updateMesh();
@@ -190,13 +284,37 @@ function Player(x,y,z){
             var collisionObject = this.isCollision(Block.blocklist);
             if(collisionObject != null){
                 var possibleMove = (collisionObject.position.z - collisionObject.scale.z/2) - (oldZ + this.radius);
-                if(possibleMove < 0.05)
+                if(possibleMove < 0.05) {
                     this.z = oldZ;
-                else
+                } else {
                     this.z = oldZ + possibleMove -0.01;
+                }
+                this.checkFire(collisionObject);
             }
         }
 
+    }
+
+    this.checkFire = function(object) {
+        if(object.type == 1) {
+            if(this.burning) {
+                this.burning = false;
+                this.emitter.disable();
+                this.groupEmitter.mesh.visible = false;
+            }
+        }
+        if((object.type == 3) && !this.burning) {
+           this.burning = true;
+           this.emitter.enable();
+           this.groupEmitter.mesh.visible = true;
+        }
+    }
+
+    this.checkWater = function(object) {
+        if(object.type == 1) {
+            this.drowning = true;
+            this.drownPosY = this.y;
+        }
     }
 
     this.resetFlags = function(){
@@ -227,7 +345,7 @@ function Player(x,y,z){
             var objectZStart = object.position.z - object.scale.z/2;
             var objectZEnd = object.position.z + object.scale.z/2;
 
-            var xStartPl = this.x - this.radiusius;
+            var xStartPl = this.x - this.radius;
             var xEndPl = this.x + this.radius;
 
             var yStartPl = this.y - this.radius;
@@ -256,19 +374,6 @@ function Player(x,y,z){
                 if(zStart < objectZEnd && zEnd > objectZStart){
                     if(yStart < objectYEnd && yEnd > objectYStart){
                         flag = true;
-
-                        if(object.type == 1) {
-                            if(this.burning) {
-                                this.burning = false;
-                                this.emitter.disable();
-                                this.groupEmitter.mesh.visible = false;
-                            }
-                        }
-                        if((object.type == 3) && !this.burning) {
-                           this.burning = true;
-                           this.emitter.enable();
-                           this.groupEmitter.mesh.visible = true;
-                        }
 
                         if(!this.floorCollision){
                             if(this.vy <= 0){
