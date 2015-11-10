@@ -65,12 +65,6 @@ function Collectibles(x,y,z) {
         dest.y = y;
         dest.z = z;
 
-        /*if (orig > dest) {
-            var tmp = dest;
-            dest = orig;
-            orig = tmp;
-        }*/
-
         speedTrans = speed;
     }
 
@@ -103,7 +97,7 @@ function Collectibles(x,y,z) {
         }
     }
 
-    this.ending = function(bonusList, scene) {
+    this.ending = function(index, bonusList, scene) {
         model.rotateOnAxis(rotate,speedRotate);
         model.position.x += dest.x*speedTrans*2;
         model.position.y += dest.y*speedTrans*2;
@@ -112,7 +106,7 @@ function Collectibles(x,y,z) {
         if (model.children[1].material.opacity <= 0.0) {
             model.renderOrder = 1;
             scene.remove(model);
-            bonusList.splice(i,1);
+            bonusList.splice(index,1);
         }
     }
 

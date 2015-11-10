@@ -326,7 +326,7 @@ function Game(){
             star = Collectibles.starList[i]
             if (star.isLoaded()) {
                 if (star.isPicked()) {
-                    star.ending(Collectibles.starList ,scene);
+                    star.ending(i, Collectibles.starList ,scene);
                 } else {
                     star.update();
                 }
