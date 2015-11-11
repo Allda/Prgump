@@ -65,7 +65,7 @@ function Game(){
         this.initCollectibles();
         this.initAudio();
 
-        player = new Player(1,1.1,3);
+        player = new Player(playerPos.x,playerPos.y+0.1,playerPos.z);
         scene.add(player.getMeshObject());
         scene.add(player.getBurningMesh());
 
@@ -182,7 +182,7 @@ function Game(){
         for (var y = 0; y < world.y; y++) {
             for (var z = 0; z < world.x; z++) {
                 for (var x = 0; x < world.z; x++) {
-                    type = currentMap[y+1].match(/\d+/g)[world.x * z + x];
+                    type = currentMap[y+1].match(/\d+/g)[world.z * z + x];
                     if (type == 9) {
                         continue;
                     }

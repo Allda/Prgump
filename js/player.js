@@ -140,6 +140,19 @@ function Player(x,y,z){
         this.updateMesh();
     }
 
+    this.groundAcceleration = function(collisionObject) {
+        switch(collisionObject.type) {
+            case FLOOR:
+                return 0.2;
+            case GRASS:
+                return -0.1;
+            case LAVA:
+                return -0.5;
+            default:
+                return 0.0;
+        }
+    }
+
     this.collisionWater = function(collisionObject, world) {
         var center = collisionObject;
         var left, leftUp, up, rightUp, right, rightDown, down, leftDown;
