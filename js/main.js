@@ -166,23 +166,24 @@ function Game(){
     }
 
     this.loadWorld = function(){
-        currentMap = mapSrc[level]
+        var currentMap = mapSrc[level];
 
         world = Object();
-        world.y = parseInt(currentMap.length) - 1;
-        world.x = parseInt(currentMap[0].match(/\d+/g)[0]);
-        world.z = parseInt(currentMap[0].match(/\d+/g)[1]);
+        world.y = currentMap.mapSrc.length;
+        world.x = currentMap.xSize;
+        world.z = currentMap.zSize;
         playerPos = new Object();
-        playerPos = { x: parseInt(currentMap[0].match(/\d+/g)[2]),
-                      y: parseInt(currentMap[0].match(/\d+/g)[3]),
-                      z: parseInt(currentMap[0].match(/\d+/g)[4]) };
+        playerPos = { x: currentMap.player.x,
+                      y: currentMap.player.y,
+                      z: currentMap.player.z };
 
         var Box_geometry = new THREE.BoxGeometry( 1, 1, 1 );
         var type;
         for (var y = 0; y < world.y; y++) {
-            for (var z = 0; z < world.x; z++) {
-                for (var x = 0; x < world.z; x++) {
-                    type = currentMap[y+1].match(/\d+/g)[world.z * z + x];
+            for (var z = 0; z < world.z; z++) {
+                for (var x = 0; x < world.x; x++) {
+                    type = currentMap.mapSrc[y][z][x];
+                    console.log(type);
                     if (type == 9) {
                         continue;
                     }

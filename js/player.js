@@ -101,7 +101,6 @@ function Player(x,y,z){
             }
             else if(this.vy <= 0) { // moving down.. floor collision
                 var possibleMove = (oldY - this.radius) - (collisionObject.position.y + collisionObject.scale.y/2);
-                console.log(possibleMove, oldY, this.y);
                 if(possibleMove < 0.05)
                     this.y = oldY;
                 else{
