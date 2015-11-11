@@ -96,10 +96,10 @@ function Game(){
         scene.add( ambient );
 
         spotLight = new THREE.SpotLight( 0xffffff );
-        spotLight.position.set( 10, 10, -5 );
+        spotLight.position.set( -5, 35, 3 );
         spotLight.castShadow = true;
         spotLight.shadowCameraNear = 8;
-        spotLight.shadowCameraFar = 30;
+        spotLight.shadowCameraFar = 40;
         spotLight.shadowDarkness = 0.5;
         spotLight.shadowCameraVisible = false;
         spotLight.shadowMapWidth = 1024;
@@ -183,7 +183,6 @@ function Game(){
             for (var z = 0; z < world.z; z++) {
                 for (var x = 0; x < world.x; x++) {
                     type = currentMap.mapSrc[y][z][x];
-                    console.log(type);
                     if (type == 9) {
                         continue;
                     }
