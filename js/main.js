@@ -324,11 +324,13 @@ function Game(){
         animatedWater.update(16000 * delta);
 
         player.update(delta, world);
-        if(player.dead)
+        if(player.dead){
             this.playerDie();
+        }
         if (!player.isDrowning()) {
             player.collisionBonus(Collectibles.starList);
         }
+        $(".health").html("Health: "+player.health);
 
         //camera.lookAt(player.getMeshObject().position);
         camera.position.x = player.x + cameraOffsetX

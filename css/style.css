@@ -57,10 +57,10 @@ body {
     position: absolute;
 }
 
-.score{
+.score, .health{
     font-size: 30px;
     font-weight: bold;
-    color:#AAA;
+    color:#FFF;
     float: right;
     margin: 10px 20px;
     position: relative;

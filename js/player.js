@@ -27,6 +27,7 @@ function Player(x,y,z){
     this.drowning = false;
     this.burning = false;
     this.dead = false;
+    this.health = 100;
 
     this.listener = new THREE.AudioListener();
     this.soundJump = new THREE.Audio( this.listener );
@@ -84,9 +85,15 @@ function Player(x,y,z){
     }
 
     this.backAlive = function(){
+        if(this.burning) {
+            this.burning = false;
+            this.emitter.disable();
+            this.groupEmitter.mesh.visible = false;
+        }
         this.drowning = false;
         this.burning = false;
         this.dead = false;
+        this.health = 100;
     }
 
     this.update = function(delta, world){
@@ -140,6 +147,11 @@ function Player(x,y,z){
             this.groupEmitter.mesh.position.y = this.y;
             this.groupEmitter.mesh.position.z = this.z;
             this.groupEmitter.tick(delta);
+            this.health -= 1;
+            if(this.health < 0){
+                this.health = 0;
+                this.dead = true;
+            }
         }
 
         this.updateMesh();
@@ -242,7 +254,7 @@ function Player(x,y,z){
     }
 
     this.moveLeft = function(cameraRotationAngle){
-        if(!this.isDrowning()){
+        if(!this.isDrowning() && !this.dead){
             var oldX = this.x;
             this.x -= this.velocity;
             var collisionObject = this.isCollision(Block.blocklist);
@@ -260,7 +272,7 @@ function Player(x,y,z){
     }
 
     this.moveRight = function(cameraRotationAngle){
-        if(!this.isDrowning()){
+        if(!this.isDrowning() && !this.dead){
             var oldX = this.x;
             this.x += this.velocity;
             var collisionObject = this.isCollision(Block.blocklist);
@@ -278,7 +290,7 @@ function Player(x,y,z){
     }
 
     this.moveForward = function(cameraRotationAngle){
-        if(!this.isDrowning()){
+        if(!this.isDrowning() && !this.dead){
             var oldZ = this.z;
             this.z -= this.velocity;
             var collisionObject = this.isCollision(Block.blocklist);
@@ -296,7 +308,7 @@ function Player(x,y,z){
     }
 
     this.moveBackward = function(cameraRotationAngle){
-        if(!this.isDrowning()){
+        if(!this.isDrowning() && !this.dead){
             var oldZ = this.z;
             this.z += this.velocity;
             var collisionObject = this.isCollision(Block.blocklist);
@@ -458,7 +470,6 @@ function Player(x,y,z){
             if(xStart < objectXEnd && xEnd > objectXStart){
                 if(zStart < objectZEnd && zEnd > objectZStart){
                     if(yStart < objectYEnd && yEnd > objectYStart){
-                        console.log("collision");
                         object.dismiss();
                     }
                 }
