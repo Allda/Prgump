@@ -400,6 +400,17 @@ function Game(){
 
     this.animate();
 
+    $(".retry").click(function(){
+        player.x = playerPos.x;
+        player.y = playerPos.y+0.1;
+        player.z = playerPos.z;
+        player.backAlive();
+        player.update();
+        $(".shadow").fadeOut("slow");
+        $(".dieScreen").fadeOut("slow");
+
+    });
+
     $(window).resize(function(){
         SCREEN_WIDTH = window.innerWidth;
         SCREEN_HEIGHT = window.innerHeight;
@@ -414,7 +425,9 @@ function initControlMenu(){
     $("#startGame").click(function(){
         $(".gameControl").fadeOut("slow", function(){
             $(".gameContent").fadeIn("slow");
+
         });
+        game = new Game();
 
     });
 
@@ -450,9 +463,10 @@ function initControlMenu(){
     });
 }
 
+
 $(document).ready(function(){
 
     initControlMenu();
 
-    game = new Game();
+
 });

@@ -1,7 +1,7 @@
 map1 = {
     xSize : 20,
     zSize : 10,
-    player: {x: 5, y: 5, z:5},
+    player: {x: 1, y: 1, z:5},
 
     mapSrc:
         [
@@ -81,5 +81,5 @@ map1 = {
 }
 
 mapSrc = {
-    "1": map1,        
+    "1": map1,
 }

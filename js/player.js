@@ -83,6 +83,12 @@ function Player(x,y,z){
         return this.burn;
     }
 
+    this.backAlive = function(){
+        this.drowning = false;
+        this.burning = false;
+        this.dead = false;
+    }
+
     this.update = function(delta, world){
         var oldY = this.y;
         this.y += this.vy;
