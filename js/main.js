@@ -193,6 +193,16 @@ function Game(){
         };
     }
 
+    this.playerDie = function(){
+        $(".shadow").fadeIn("slow");
+        $(".dieScreen").fadeIn("slow");
+    }
+
+    this.playerWin = function(){
+        $(".shadow").fadeIn("slow");
+        $(".winScreen").fadeIn("slow");
+    }
+
     this.cameraNextStep = function(){
         if(cameraOffsetX == 0 && cameraOffsetZ == 5){
             cameraOffsetX = -5;
@@ -314,6 +324,8 @@ function Game(){
         animatedWater.update(16000 * delta);
 
         player.update(delta, world);
+        if(player.dead)
+            this.playerDie();
         if (!player.isDrowning()) {
             player.collisionBonus(Collectibles.starList);
         }
@@ -400,7 +412,6 @@ function Game(){
 
 function initControlMenu(){
     $("#startGame").click(function(){
-        console.log("start");
         $(".gameControl").fadeOut("slow", function(){
             $(".gameContent").fadeIn("slow");
         });
