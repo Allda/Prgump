@@ -63,7 +63,6 @@ function Game(){
         this.loadTextures();
         this.loadWorld();
 
-        this.initCollectibles();
         this.initAudio();
 
         player = new Player(playerPos.x,playerPos.y+0.1,playerPos.z);
@@ -72,11 +71,24 @@ function Game(){
 
     }
 
-    this.initCollectibles = function(){
-        var star = new Collectibles(3, 4, 0);
-        star.setTranslation(0, 0.5, 0, 0.02);
-        star.setRotate(0, 1, 0, 0.02);
-        star.loadModel('star', scene);
+    this.initCollectibles = function(position){
+        this.removeAllColectibles();
+        Collectibles.starList = [];
+        for(var i = 0; i < position.length;i++){
+            var star = new Collectibles(position[i].x, position[i].y, position[i].z);
+            star.setTranslation(0, 0.5, 0, 0.02);
+            star.setRotate(0, 1, 0, 0.02);
+            star.loadModel('star', scene);
+        }
+    }
+
+    this.removeAllColectibles = function(){
+        if(Collectibles.starList == undefined)
+            return;
+        for(var i=0; i < Collectibles.starList.length; i++){
+            objectMesh = Collectibles.starList[i].getMeshObject();
+            scene.remove(objectMesh);
+        }
     }
 
     this.initAudio = function() {
@@ -189,9 +201,10 @@ function Game(){
             };
         };
         var finishPosition = currentMap.finish;
-        console.log(finishPosition);
         finish = new model3D(finishPosition.x,finishPosition.y,finishPosition.z);
         finish.loadModel("goal", scene);
+
+        this.initCollectibles(currentMap.collectibles);
     }
 
     this.playerDie = function(){
@@ -411,6 +424,8 @@ function Game(){
         player.update();
         $(".shadow").fadeOut("slow");
         $(".dieScreen").fadeOut("slow");
+        var currentMap = mapSrc[level];
+        game.initCollectibles(currentMap.collectibles);
 
     });
 

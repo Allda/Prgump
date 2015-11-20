@@ -99,7 +99,10 @@ function Player(x,y,z){
         this.burning = false;
         this.dead = false;
         this.health = 100;
+        this.maxJumps = 2;
     }
+
+
 
     this.update = function(delta, world){
         var oldY = this.y;
@@ -458,6 +461,8 @@ function Player(x,y,z){
             objectMesh = object.getMeshObject();
             if (!objectMesh)
                 continue;
+            if(object.isPicked())
+                continue;
             var xStart = this.x - this.sphere.scale.x/2;
             var xEnd = this.x + this.sphere.scale.x/2;
             var objectXStart = objectMesh.position.x - objectMesh.scale.x/2;
@@ -477,6 +482,7 @@ function Player(x,y,z){
                 if(zStart < objectZEnd && zEnd > objectZStart){
                     if(yStart < objectYEnd && yEnd > objectYStart){
                         object.dismiss();
+                        this.maxJumps++;
                     }
                 }
             }

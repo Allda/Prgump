@@ -51,7 +51,7 @@ function Collectibles(x,y,z) {
         	},
         	// Function called when downloads progress
         	function ( xhr ) {
-        		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+        		
         	},
         	// Function called when downloads error
         	function ( xhr ) {
