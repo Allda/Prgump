@@ -3,6 +3,8 @@ map1 = {
     zSize : 10,
     player: {x: 1, y: 1, z:5},
 
+    finish: {x: 19, y: 4.4, z: 9},
+
     mapSrc:
         [
             [

@@ -2,6 +2,7 @@ var player;
 var level = "1";
 var keyboard;
 var world;
+var finish;
 
 function Game(){
 
@@ -69,10 +70,6 @@ function Game(){
         scene.add(player.getMeshObject());
         scene.add(player.getBurningMesh());
 
-        var start = new model3D(0,1.4,0);
-        start.loadModel("start", scene);
-        var start2 = new model3D(2,3.4,4);
-        start2.loadModel("goal", scene);
     }
 
     this.initCollectibles = function(){
@@ -191,6 +188,10 @@ function Game(){
                 };
             };
         };
+        var finishPosition = currentMap.finish;
+        console.log(finishPosition);
+        finish = new model3D(finishPosition.x,finishPosition.y,finishPosition.z);
+        finish.loadModel("goal", scene);
     }
 
     this.playerDie = function(){
