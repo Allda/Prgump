@@ -23,6 +23,8 @@ function Player(x,y,z){
     this.forwardFlag = false;
     this.backwardFlag = false;
 
+    this.jumpCount = 0;
+    this.maxJumps = 2;
     this.drownPosY;
     this.drowning = false;
     this.burning = false;
@@ -72,8 +74,11 @@ function Player(x,y,z){
     }
 
     this.jump = function(){
-        this.vy = 0.3;
-        this.soundJump.play();
+        if(this.jumpCount < this.maxJumps){
+            this.jumpCount += 1;
+            this.vy = 0.3;
+            this.soundJump.play();
+        }
     }
 
     this.isDrowning = function() {
@@ -120,6 +125,7 @@ function Player(x,y,z){
                     this.y = oldY - possibleMove + 0.01;
                 }
                 this.vy = 0;
+                this.jumpCount = 0;
                 floorTouch = true;
                 if ((!this.drowning) && (collisionObject.type == 1)) {
                     if (this.collisionWater(collisionObject, world)) {
