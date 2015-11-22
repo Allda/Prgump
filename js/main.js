@@ -533,8 +533,5 @@ function initControlMenu(){
 
 
 $(document).ready(function(){
-    console.log("trada");
     initControlMenu();
-
-
 });
