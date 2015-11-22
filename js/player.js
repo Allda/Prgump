@@ -102,7 +102,12 @@ function Player(x,y,z){
         this.maxJumps = 2;
     }
 
-
+    this.setPosition = function(possition) {
+        this.x = possition.x;
+        this.y = possition.y;
+        this.z = possition.z;
+        this.updateMesh();
+    }
 
     this.update = function(delta, world){
         var oldY = this.y;

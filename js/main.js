@@ -1,5 +1,5 @@
 var player;
-var level = "1";
+var level = 0;
 var keyboard;
 var world;
 var finish;
@@ -27,6 +27,8 @@ function Game(){
     // Particles
     var emitter;
     var groupEmitter;
+
+    var gamePause = true;
 
     this.init = function(){
         /*Creates empty scene object and renderer*/
@@ -221,6 +223,7 @@ function Game(){
     this.playerWin = function(){
         $(".shadow").fadeIn("slow");
         $(".winScreen").fadeIn("slow");
+        gamePause = false;
     }
 
     this.cameraNextStep = function(){
@@ -247,6 +250,8 @@ function Game(){
     }
 
     kd.W.down(function (){
+        if(!gamePause)
+            return;
         if(cameraRotationAngle == 0){
             player.moveForward();
         }
@@ -261,6 +266,8 @@ function Game(){
         }
     });
     kd.S.down(function (){
+        if(!gamePause)
+            return;
         if(cameraRotationAngle == 0){
             player.moveBackward();
         }
@@ -275,6 +282,8 @@ function Game(){
         }
     });
     kd.A.down(function (){
+        if(!gamePause)
+            return;
         if(cameraRotationAngle == 0){
             player.moveLeft();
         }
@@ -289,6 +298,8 @@ function Game(){
         }
     });
     kd.D.down(function (){
+        if(!gamePause)
+            return;
         if(cameraRotationAngle == 0){
             player.moveRight();
         }
@@ -303,16 +314,21 @@ function Game(){
         }
     });
     kd.SPACE.press(function(){
+        if(!gamePause)
+            return;
         if(!player.isDrowning()) {
             player.jump();
         }
     })
     kd.P.press(function(){
+        if(!gamePause)
+            return;
         game.cameraNextStep();
     });
 
     this.update = function(){
-
+        if(!gamePause)
+            return;
         /*if(keyboard.pressed("W")){
             player.moveForward();
         }
@@ -354,6 +370,7 @@ function Game(){
             this.playerWin();
         }
         $(".health").html("Health: "+player.health);
+        $(".levelDisplay").html("Level: "+(level+1));
 
         //camera.lookAt(player.getMeshObject().position);
         camera.position.x = player.x + cameraOffsetX
@@ -439,6 +456,8 @@ function Game(){
     });
 
     $(".nextLevel").click(function(){
+        gamePause = true;
+        scene.remove(finish.getMeshObject());
         game.removeAllColectibles();
         Collectibles.starList = [];
         Block.blocklist = [];
@@ -447,6 +466,11 @@ function Game(){
             $(".shadow").fadeOut("slow");
             $(".winScreen").fadeOut("slow");
         }
+        level++;
+        if(level >= mapSrc.length)
+            level = 0;
+        game.loadWorld();
+        player.setPosition(mapSrc[level].player);
     });
 
     $(window).resize(function(){
@@ -460,6 +484,11 @@ function Game(){
 }
 
 function initControlMenu(){
+    for (var i = 0; i < mapSrc.length; i++) {
+        levelIter = i + 1
+        $("#levels").append('<li class="level">level '+ levelIter +'</li>');
+    }
+    $("#levels").append('<li class="back backLevel">Back</li>')
     $("#startGame").click(function(){
         $(".gameControl").fadeOut("slow", function(){
             $(".gameContent").fadeIn("slow");
@@ -494,7 +523,8 @@ function initControlMenu(){
     });
 
     $(".level").click(function(){
-        level = $(this).html().split(" ")[1];
+
+        level = parseInt($(this).html().split(" ")[1]) - 1;
         $("#levels").fadeOut("slow", function(){
             $("#options").fadeIn("slow");
         });
@@ -503,7 +533,7 @@ function initControlMenu(){
 
 
 $(document).ready(function(){
-
+    console.log("trada");
     initControlMenu();
 
 

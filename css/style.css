@@ -57,7 +57,7 @@ body {
     position: absolute;
 }
 
-.score, .health{
+.score, .health, .levelDisplay{
     font-size: 30px;
     font-weight: bold;
     color:#FFF;
