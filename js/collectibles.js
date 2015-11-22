@@ -51,7 +51,7 @@ function Collectibles(x,y,z) {
         	},
         	// Function called when downloads progress
         	function ( xhr ) {
-        		
+
         	},
         	// Function called when downloads error
         	function ( xhr ) {

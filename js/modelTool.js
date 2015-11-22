@@ -1,7 +1,8 @@
 function model3D(x, y, z) {
-    var x = x;
-    var y = y;
-    var z = z;
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    var model;
 
     this.loadModel = function(modelName, scene) {
         // instantiate a loader
@@ -15,7 +16,7 @@ function model3D(x, y, z) {
             'models/' + modelName + '.mtl',
             // Function when both resources are loaded
             function ( loadedModel ) {
-                var model = loadedModel.children[0];
+                model = loadedModel.children[0];
                 model.position.x = x;
                 model.position.y = y;
                 model.position.z = z;
@@ -30,6 +31,10 @@ function model3D(x, y, z) {
                 console.log( 'An error happened' );
             }
         );
+    }
+
+    this.getMeshObject = function(argument) {
+        return model;
     }
 
     this.setTranslation = function(x, y, z) {

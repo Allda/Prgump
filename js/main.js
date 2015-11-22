@@ -3,6 +3,7 @@ var level = "1";
 var keyboard;
 var world;
 var finish;
+var removableBlocks = [];
 
 function Game(){
 
@@ -79,6 +80,8 @@ function Game(){
             star.setTranslation(0, 0.5, 0, 0.02);
             star.setRotate(0, 1, 0, 0.02);
             star.loadModel('star', scene);
+            removableBlocks.push(star.getMeshObject());
+
         }
     }
 
@@ -197,12 +200,15 @@ function Game(){
                     }
                     var block = new Block(world, x, y, z, type, textures[type]);
                     scene.add(block.getMeshObject());
+                    removableBlocks.push(block.getMeshObject());
                 };
             };
         };
         var finishPosition = currentMap.finish;
         finish = new model3D(finishPosition.x,finishPosition.y,finishPosition.z);
         finish.loadModel("goal", scene);
+        removableBlocks.push(finish.getMeshObject());
+
 
         this.initCollectibles(currentMap.collectibles);
     }
@@ -344,6 +350,9 @@ function Game(){
         if (!player.isDrowning()) {
             player.collisionBonus(Collectibles.starList);
         }
+        if(player.collisionFinish(finish)){
+            this.playerWin();
+        }
         $(".health").html("Health: "+player.health);
 
         //camera.lookAt(player.getMeshObject().position);
@@ -427,6 +436,17 @@ function Game(){
         var currentMap = mapSrc[level];
         game.initCollectibles(currentMap.collectibles);
 
+    });
+
+    $(".nextLevel").click(function(){
+        game.removeAllColectibles();
+        Collectibles.starList = [];
+        Block.blocklist = [];
+        for (var i = 0; i < removableBlocks.length; i++) {
+            scene.remove(removableBlocks[i]);
+            $(".shadow").fadeOut("slow");
+            $(".winScreen").fadeOut("slow");
+        }
     });
 
     $(window).resize(function(){

@@ -489,6 +489,26 @@ function Player(x,y,z){
         }
     }
 
+    this.collisionFinish = function(finish){
+        var xStart = this.x - this.sphere.scale.x/2;
+        var xEnd = this.x + this.sphere.scale.x/2;
+
+        var yStart = this.y - this.sphere.scale.y/2;
+        var yEnd = this.y + this.sphere.scale.y/2;
+
+        var zStart = this.z - this.sphere.scale.z/2;
+        var zEnd = this.z + this.sphere.scale.z/2;
+
+        if(xStart < finish.x && xEnd > finish.x){
+            if(zStart < finish.z && zEnd > finish.z){
+                if(yStart < finish.y && yEnd > finish.y){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     this.isCollision = function(blockList){
         for (var i = 0; i < blockList.length; i++) {
             objectMesh = blockList[i];
