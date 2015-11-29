@@ -209,10 +209,13 @@ function Game(){
             };
         };
         var finishPosition = currentMap.finish;
+        var startPosition = currentMap.player;
         finish = new model3D(finishPosition.x,finishPosition.y,finishPosition.z);
         finish.loadModel("goal", scene);
+        start = new model3D(startPosition.x,startPosition.y-0.6,startPosition.z);
+        start.loadModel("start", scene);
         removableBlocks.push(finish.getMeshObject());
-
+        removableBlocks.push(start.getMeshObject());
 
         this.initCollectibles(currentMap.collectibles);
     }
