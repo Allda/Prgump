@@ -202,6 +202,10 @@ function Player(x,y,z){
         if ((center.position.x > 0) && (center.position.z < world.z))
             leftDown = Block.getBlock(center.index-1+world.x, blockType);
 
+        if ((center.type != blockType) && (blockType != WATER)) {
+            return false;
+        }
+
         var posX = this.x + this.radius - (center.position.x + center.scale.x/2);
         var posZ = this.z + this.radius - (center.position.z + center.scale.z/2);
 
@@ -338,33 +342,8 @@ function Player(x,y,z){
 
     this.checkFire = function(object, world) {
         var center = object;
-        var isWater = collisionObject(object, world, WATER);
+        var isWater = this.collisionBlock(object, world, WATER);
 
-/*        if (center.position.x > 0)
-            if (typeof Block.getBlock(center.index-1, WATER) != 'undefined')
-                isWater = true;
-        if ((center.position.x > 0) && (center.position.z > 0))
-            if (typeof Block.getBlock(center.index-1-world.x, 1) != 'undefined')
-                isWater = true;
-        if (center.position.z > 0)
-            if (typeof Block.getBlock(center.index-world.x, 1) != 'undefined')
-                isWater = true;
-        if ((center.position.x < world.x) && (center.position.z > 0))
-            if (typeof Block.getBlock(center.index+1-world.x, 1) != 'undefined')
-                isWater = true;
-        if (center.position.x < world.x)
-            if (typeof Block.getBlock(center.index+1, 1) != 'undefined')
-                isWater = true;
-        if ((center.position.x < world.x) && (center.position.z < world.z))
-            if (typeof Block.getBlock(center.index+1+world.x, 1) != 'undefined')
-                isWater = true;
-        if (center.position.z < world.z)
-            if (typeof Block.getBlock(center.index+world.x, 1) != 'undefined')
-                isWater = true;
-        if ((center.position.x > 0) && (center.position.z < world.z))
-            if (typeof Block.getBlock(center.index-1+world.x, 1) != 'undefined')
-                isWater = true;
-*/
         if(isWater) {
             if(this.burning) {
                 this.burning = false;
@@ -373,10 +352,13 @@ function Player(x,y,z){
             }
         }
 
-        if((object.type == LAVA) && !this.burning) {
-           this.burning = true;
-           this.emitter.enable();
-           this.groupEmitter.mesh.visible = true;
+        var isLava = this.collisionBlock(object, world, LAVA);
+        if(isLava) {
+            if(!this.burning) {
+               this.burning = true;
+               this.emitter.enable();
+               this.groupEmitter.mesh.visible = true;
+            }
         }
     }
 
