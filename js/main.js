@@ -436,6 +436,7 @@ function Game(){
 
     $(".nextLevel").click(function(){
         gamePause = true;
+        player.backAlive()
         scene.remove(finish.getMeshObject());
         game.removeAllColectibles();
         Collectibles.starList = [];
