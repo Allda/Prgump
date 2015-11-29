@@ -426,7 +426,8 @@ function Game(){
         player.y = playerPos.y+0.1;
         player.z = playerPos.z;
         player.backAlive();
-        player.update();
+        var delta = clock.getDelta();
+        player.update(delta, world);
         $(".shadow").fadeOut("slow");
         $(".dieScreen").fadeOut("slow");
         var currentMap = mapSrc[level];
