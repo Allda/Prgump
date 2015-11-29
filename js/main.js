@@ -329,37 +329,16 @@ function Game(){
     this.update = function(){
         if(!gamePause)
             return;
-        /*if(keyboard.pressed("W")){
-            player.moveForward();
-        }
-        if(keyboard.pressed("S")){
-            player.moveBackward();
-        }
-        if(keyboard.pressed("A")){
-            player.moveLeft();
-        }
-        if(keyboard.pressed("D")){
-            player.moveRight();
-        }
-        if(keyboard.pressed("space")){
-            player.jump();
-        }
-        if(keyboard.pressed("P") && cameraUpdate == false){
-            this.cameraNextStep();
-            cameraUpdate = true;
-        }
-        else{
-            cameraUpdate = false;
-        }
-        if(keyboard.pressed("esc")){
-            $(".gameControl").show();
-            $(".gameContent").hide();
-        }*/
+
         var delta = clock.getDelta();
         animatedLava.update(1000 * delta);
         animatedWater.update(16000 * delta);
-
-        player.update(delta, world);
+        if(!player.dead)
+            player.update(delta, world);
+        if(player.y < -5){
+            player.dead = true;
+            this.playerDie();
+        }
         if(player.dead){
             this.playerDie();
         }
@@ -506,6 +485,18 @@ function initControlMenu(){
 
     $(".backLevel").click(function(){
         $("#levels").fadeOut("slow", function(){
+            $("#options").fadeIn("slow");
+        });
+    });
+
+    $("#control").click(function(){
+        $("#options").fadeOut("slow", function(){
+            $(".control").fadeIn("slow");
+        });
+    });
+
+    $(".backControl").click(function(){
+        $(".control").fadeOut("slow", function(){
             $("#options").fadeIn("slow");
         });
     });

@@ -50,6 +50,11 @@ body {
 
 }
 
+.control{
+    margin: auto;
+    display: none;
+}
+
 .gameInfo, .inGameControll, .shadow{
     width: 100%;
     height: 100%;
