@@ -19,7 +19,8 @@ function Player(x,y,z){
 
 
     this.jumpCount = 0;
-    this.maxJumps = 2;
+    this.maxJumps = 1;
+    this.maxJumpsInit = 1;
     this.drownPosY;
     this.drowning = false;
     this.burning = false;
