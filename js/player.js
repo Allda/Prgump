@@ -283,7 +283,6 @@ function Player(x,y,z){
                 this.checkFire(collisionObject, world);
             }
         }
-        //this.updateMesh();
     }
 
     this.moveRight = function(world){
@@ -301,7 +300,6 @@ function Player(x,y,z){
                 this.checkFire(collisionObject, world);
             }
         }
-        //this.updateMesh();
     }
 
     this.moveForward = function(world){
@@ -319,7 +317,6 @@ function Player(x,y,z){
                 this.checkFire(collisionObject, world);
             }
         }
-        //this.updateMesh();
     }
 
     this.moveBackward = function(world){
