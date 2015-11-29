@@ -95,7 +95,7 @@ function Player(x,y,z){
         this.burning = false;
         this.dead = false;
         this.health = 100;
-        this.maxJumps = 2;
+        this.maxJumps = this.maxJumpsInit;
     }
 
     this.setPosition = function(possition) {
