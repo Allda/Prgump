@@ -89,3 +89,14 @@ body {
     background: rgba(0, 0, 0, 0.6);
     z-index: 15;
 }
+
+.stars{
+    margin: 20px auto;
+    height: 100px;
+}
+
+.star img{
+    float: left;
+    width: auto;
+    max-height: 100%;
+}

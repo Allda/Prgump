@@ -30,6 +30,8 @@ function Game(){
 
     var gamePause = true;
 
+    this.startTime;
+
     this.init = function(){
         /*Creates empty scene object and renderer*/
         scene = new THREE.Scene();
@@ -221,6 +223,18 @@ function Game(){
     }
 
     this.playerWin = function(){
+        var endTime = new Date().getTime()/1000;
+        var stars = 1;
+        var starTimes = mapSrc[level].starTime;
+        console.log(endTime, this.startTime);
+        if(endTime - this.startTime < starTimes.gold)
+            stars = 3;
+        else if(endTime - this.startTime < starTimes.silver)
+            stars = 2;
+        $(".stars").empty();
+        for (var i = 0; i < stars; i++) {
+            $(".stars").append("<img src='img/star.png'>");
+        }
         $(".shadow").fadeIn("slow");
         $(".winScreen").fadeIn("slow");
         gamePause = false;
@@ -418,7 +432,7 @@ function Game(){
 
     this.init();
     this.setScene();
-
+    this.startTime = new Date().getTime()/1000;
     this.animate();
 
     $(".retry").click(function(){
@@ -432,6 +446,7 @@ function Game(){
         $(".dieScreen").fadeOut("slow");
         var currentMap = mapSrc[level];
         game.initCollectibles(currentMap.collectibles);
+        this.startTime = new Date().getTime()/1000;
 
     });
 
@@ -452,6 +467,7 @@ function Game(){
             level = 0;
         game.loadWorld();
         player.setPosition(mapSrc[level].player);
+        this.startTime = new Date().getTime()/1000;
     });
 
     $(window).resize(function(){
