@@ -52,7 +52,7 @@ function Player(x,y,z){
         depthTest: true,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
-        scale: 45
+        scale: 45,
     });
     this.groupEmitter.addEmitter(this.emitter);
     this.groupEmitter.mesh.castShadow = true;
@@ -283,7 +283,7 @@ function Player(x,y,z){
                 this.checkFire(collisionObject, world);
             }
         }
-        this.updateMesh();
+        //this.updateMesh();
     }
 
     this.moveRight = function(world){
@@ -296,12 +296,12 @@ function Player(x,y,z){
                 if(possibleMove < 0.05) {
                     this.x = oldX;
                 } else {
-                    this.x = oldX +possibleMove-0.01;
+                    this.x = oldX + possibleMove-0.01;
                 }
                 this.checkFire(collisionObject, world);
             }
         }
-        this.updateMesh();
+        //this.updateMesh();
     }
 
     this.moveForward = function(world){
@@ -319,7 +319,7 @@ function Player(x,y,z){
                 this.checkFire(collisionObject, world);
             }
         }
-        this.updateMesh();
+        //this.updateMesh();
     }
 
     this.moveBackward = function(world){
