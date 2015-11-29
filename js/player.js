@@ -17,7 +17,6 @@ function Player(x,y,z){
     this.vy = 0.0;
     this.velocity = 0.1;
 
-
     this.jumpCount = 0;
     this.maxJumps = 1;
     this.maxJumpsInit = 1;
@@ -121,7 +120,7 @@ function Player(x,y,z){
                     this.y = oldY + possibleMove - 0.01;
                 this.vy = 0;
                 this.vy -= this.gravity;
-                this.checkFire(collisionObject);
+                this.checkFire(collisionObject, world);
             }
             else if(this.vy <= 0) { // moving down.. floor collision
                 var possibleMove = (oldY - this.radius) - (collisionObject.position.y + collisionObject.scale.y/2);
@@ -133,13 +132,13 @@ function Player(x,y,z){
                 this.vy = 0;
                 this.jumpCount = 0;
                 floorTouch = true;
-                if ((!this.drowning) && (collisionObject.type == 1)) {
-                    if (this.collisionWater(collisionObject, world)) {
+                if ((!this.drowning) && (collisionObject.type == WATER)) {
+                    if (this.collisionBlock(collisionObject, world, WATER)) {
                         this.checkWater(collisionObject, world);
                         this.dead = true;
                     };
                 }
-                this.checkFire(collisionObject);
+                this.checkFire(collisionObject, world);
             }
         }
         else{
@@ -182,26 +181,26 @@ function Player(x,y,z){
         }
     }
 
-    this.collisionWater = function(collisionObject, world) {
+    this.collisionBlock = function(collisionObject, world, blockType) {
         var center = collisionObject;
         var left, leftUp, up, rightUp, right, rightDown, down, leftDown;
 
         if (center.position.x > 0)
-            left = Block.getBlock(center.index-1, 1);
+            left = Block.getBlock(center.index-1, blockType);
         if ((center.position.x > 0) && (center.position.z > 0))
-            leftUp = Block.getBlock(center.index-1-world.x, 1);
+            leftUp = Block.getBlock(center.index-1-world.x, blockType);
         if (center.position.z > 0)
-            up = Block.getBlock(center.index-world.x, 1);
+            up = Block.getBlock(center.index-world.x, blockType);
         if ((center.position.x < world.x) && (center.position.z > 0))
-            rightUp = Block.getBlock(center.index+1-world.x, 1);
+            rightUp = Block.getBlock(center.index+1-world.x, blockType);
         if (center.position.x < world.x)
-            right = Block.getBlock(center.index+1, 1);
+            right = Block.getBlock(center.index+1, blockType);
         if ((center.position.x < world.x) && (center.position.z < world.z))
-            rightDown = Block.getBlock(center.index+1+world.x, 1);
+            rightDown = Block.getBlock(center.index+1+world.x, blockType);
         if (center.position.z < world.z)
-            down = Block.getBlock(center.index+world.x, 1);
+            down = Block.getBlock(center.index+world.x, blockType);
         if ((center.position.x > 0) && (center.position.z < world.z))
-            leftDown = Block.getBlock(center.index-1+world.x, 1);
+            leftDown = Block.getBlock(center.index-1+world.x, blockType);
 
         var posX = this.x + this.radius - (center.position.x + center.scale.x/2);
         var posZ = this.z + this.radius - (center.position.z + center.scale.z/2);
@@ -265,7 +264,7 @@ function Player(x,y,z){
         this.sphere.position.z = this.z;
     }
 
-    this.moveLeft = function(cameraRotationAngle){
+    this.moveLeft = function(world){
         if(!this.isDrowning() && !this.dead){
             var oldX = this.x;
             this.x -= this.velocity;
@@ -277,13 +276,13 @@ function Player(x,y,z){
                 } else {
                     this.x = oldX - possibleMove+0.01;
                 }
-                this.checkFire(collisionObject);
+                this.checkFire(collisionObject, world);
             }
         }
         this.updateMesh();
     }
 
-    this.moveRight = function(cameraRotationAngle){
+    this.moveRight = function(world){
         if(!this.isDrowning() && !this.dead){
             var oldX = this.x;
             this.x += this.velocity;
@@ -295,13 +294,13 @@ function Player(x,y,z){
                 } else {
                     this.x = oldX +possibleMove-0.01;
                 }
-                this.checkFire(collisionObject);
+                this.checkFire(collisionObject, world);
             }
         }
         this.updateMesh();
     }
 
-    this.moveForward = function(cameraRotationAngle){
+    this.moveForward = function(world){
         if(!this.isDrowning() && !this.dead){
             var oldZ = this.z;
             this.z -= this.velocity;
@@ -313,13 +312,13 @@ function Player(x,y,z){
                 } else {
                     this.z = oldZ - possibleMove +0.01;
                 }
-                this.checkFire(collisionObject);
+                this.checkFire(collisionObject, world);
             }
         }
         this.updateMesh();
     }
 
-    this.moveBackward = function(cameraRotationAngle){
+    this.moveBackward = function(world){
         if(!this.isDrowning() && !this.dead){
             var oldZ = this.z;
             this.z += this.velocity;
@@ -331,21 +330,50 @@ function Player(x,y,z){
                 } else {
                     this.z = oldZ + possibleMove -0.01;
                 }
-                this.checkFire(collisionObject);
+                this.checkFire(collisionObject, world);
             }
         }
 
     }
 
-    this.checkFire = function(object) {
-        if(object.type == 1) {
+    this.checkFire = function(object, world) {
+        var center = object;
+        var isWater = collisionObject(object, world, WATER);
+
+/*        if (center.position.x > 0)
+            if (typeof Block.getBlock(center.index-1, WATER) != 'undefined')
+                isWater = true;
+        if ((center.position.x > 0) && (center.position.z > 0))
+            if (typeof Block.getBlock(center.index-1-world.x, 1) != 'undefined')
+                isWater = true;
+        if (center.position.z > 0)
+            if (typeof Block.getBlock(center.index-world.x, 1) != 'undefined')
+                isWater = true;
+        if ((center.position.x < world.x) && (center.position.z > 0))
+            if (typeof Block.getBlock(center.index+1-world.x, 1) != 'undefined')
+                isWater = true;
+        if (center.position.x < world.x)
+            if (typeof Block.getBlock(center.index+1, 1) != 'undefined')
+                isWater = true;
+        if ((center.position.x < world.x) && (center.position.z < world.z))
+            if (typeof Block.getBlock(center.index+1+world.x, 1) != 'undefined')
+                isWater = true;
+        if (center.position.z < world.z)
+            if (typeof Block.getBlock(center.index+world.x, 1) != 'undefined')
+                isWater = true;
+        if ((center.position.x > 0) && (center.position.z < world.z))
+            if (typeof Block.getBlock(center.index-1+world.x, 1) != 'undefined')
+                isWater = true;
+*/
+        if(isWater) {
             if(this.burning) {
                 this.burning = false;
                 this.emitter.disable();
                 this.groupEmitter.mesh.visible = false;
             }
         }
-        if((object.type == 3) && !this.burning) {
+
+        if((object.type == LAVA) && !this.burning) {
            this.burning = true;
            this.emitter.enable();
            this.groupEmitter.mesh.visible = true;
@@ -353,7 +381,7 @@ function Player(x,y,z){
     }
 
     this.checkWater = function(object) {
-        if(object.type == 1) {
+        if(object.type == WATER) {
             this.drowning = true;
             this.drownPosY = this.y;
         }

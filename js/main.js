@@ -253,64 +253,64 @@ function Game(){
         if(!gamePause)
             return;
         if(cameraRotationAngle == 0){
-            player.moveForward();
+            player.moveForward(world);
         }
         else if (cameraRotationAngle == 90) {
-            player.moveRight();
+            player.moveRight(world);
         }
         else if (cameraRotationAngle == 180) {
-            player.moveBackward();
+            player.moveBackward(world);
         }
         else if (cameraRotationAngle == 270) {
-            player.moveLeft();
+            player.moveLeft(world);
         }
     });
     kd.S.down(function (){
         if(!gamePause)
             return;
         if(cameraRotationAngle == 0){
-            player.moveBackward();
+            player.moveBackward(world);
         }
         else if (cameraRotationAngle == 90) {
-            player.moveLeft();
+            player.moveLeft(world);
         }
         else if (cameraRotationAngle == 180) {
-            player.moveForward();
+            player.moveForward(world);
         }
         else if (cameraRotationAngle == 270) {
-            player.moveRight();
+            player.moveRight(world);
         }
     });
     kd.A.down(function (){
         if(!gamePause)
             return;
         if(cameraRotationAngle == 0){
-            player.moveLeft();
+            player.moveLeft(world);
         }
         else if (cameraRotationAngle == 90) {
-            player.moveForward();
+            player.moveForward(world);
         }
         else if (cameraRotationAngle == 180) {
-            player.moveRight();
+            player.moveRight(world);
         }
         else if (cameraRotationAngle == 270) {
-            player.moveBackward();
+            player.moveBackward(world);
         }
     });
     kd.D.down(function (){
         if(!gamePause)
             return;
         if(cameraRotationAngle == 0){
-            player.moveRight();
+            player.moveRight(world);
         }
         else if (cameraRotationAngle == 90) {
-            player.moveBackward();
+            player.moveBackward(world);
         }
         else if (cameraRotationAngle == 180) {
-            player.moveLeft();
+            player.moveLeft(world);
         }
         else if (cameraRotationAngle == 270) {
-            player.moveForward();
+            player.moveForward(world);
         }
     });
     kd.SPACE.press(function(){
