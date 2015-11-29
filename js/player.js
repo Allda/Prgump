@@ -26,6 +26,7 @@ function Player(x,y,z){
     this.burning = false;
     this.dead = false;
     this.health = 100;
+    this.falling = false;
 
     this.listener = new THREE.AudioListener();
     this.soundJump = new THREE.Audio( this.listener );
@@ -96,6 +97,7 @@ function Player(x,y,z){
         this.dead = false;
         this.health = 100;
         this.maxJumps = this.maxJumpsInit;
+        this.falling = false;
     }
 
     this.setPosition = function(possition) {

@@ -333,10 +333,10 @@ function Game(){
         var delta = clock.getDelta();
         animatedLava.update(1000 * delta);
         animatedWater.update(16000 * delta);
-        if(!player.dead)
+        if(!player.falling)
             player.update(delta, world);
         if(player.y < -5){
-            player.dead = true;
+            player.falling = true;
             this.playerDie();
         }
         if(player.dead){
