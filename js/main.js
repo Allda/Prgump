@@ -43,12 +43,8 @@ function Game(){
         renderer.shadowMap.enabled = true;
         renderer.shadowMapSoft = true;
 
-        /*Add controls*/
-        controls = new THREE.OrbitControls( camera, renderer.domElement );
-        controls.addEventListener( 'change', this.render );
 
         /*Add keyboard catch*/
-        //keyboard = new THREEx.KeyboardState();
         kd.run(function () {
             kd.tick();
         });
