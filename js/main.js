@@ -225,7 +225,6 @@ function Game(){
         var endTime = new Date().getTime()/1000;
         var stars = 1;
         var starTimes = mapSrc[level].starTime;
-        console.log(endTime, this.startTime);
         if(endTime - this.startTime < starTimes.gold)
             stars = 3;
         else if(endTime - this.startTime < starTimes.silver)
@@ -363,6 +362,19 @@ function Game(){
         }
         $(".health").html("Health: "+player.health);
         $(".levelDisplay").html("Level: "+(level+1));
+        var currentTime = new Date().getTime()/1000;
+        var timeFromStart = currentTime -this.startTime;
+        var timeFromStartInt =  Math.floor( timeFromStart );
+        console.log(this.startTime);
+        $(".time").html("Time: "+ timeFromStartInt);
+        var color = "#cd7f32";
+        var starTimes = mapSrc[level].starTime;
+        if(timeFromStart < starTimes.gold)
+            color = "#FFDF00"
+        else if(timeFromStart < starTimes.silver)
+            color = "#c0c0c0"
+        $(".time").css('color', color);
+
 
         //camera.lookAt(player.getMeshObject().position);
         camera.position.x = player.x + cameraOffsetX
@@ -445,7 +457,7 @@ function Game(){
         $(".dieScreen").fadeOut("slow");
         var currentMap = mapSrc[level];
         game.initCollectibles(currentMap.collectibles);
-        this.startTime = new Date().getTime()/1000;
+        game.startTime = new Date().getTime()/1000;
 
     });
 
@@ -466,7 +478,7 @@ function Game(){
             level = 0;
         game.loadWorld();
         player.setPosition(mapSrc[level].player);
-        this.startTime = new Date().getTime()/1000;
+        game.startTime = new Date().getTime()/1000;
     });
 
     $(window).resize(function(){

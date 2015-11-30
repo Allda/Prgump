@@ -62,7 +62,7 @@ body {
     position: absolute;
 }
 
-.score, .health, .levelDisplay{
+.time, .health, .levelDisplay{
     font-size: 30px;
     font-weight: bold;
     color:#FFF;
@@ -70,6 +70,11 @@ body {
     margin: 10px 20px;
     position: relative;
     z-index: 10;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
 }
 .dieScreen, .winScreen{
     position: relative;
