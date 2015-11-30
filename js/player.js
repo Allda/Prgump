@@ -213,9 +213,12 @@ function Player(x,y,z){
         var posZ = this.z + this.radius - (center.position.z + center.scale.z/2);
 
         /* Check center position */
-        if ((posX < 0.0) && (posX > -0.5) &&
-            (posZ < 0.0) && (posZ > -0.5)) {
-            return true;
+        if (((center.type == blockType) && (blockType == WATER)) ||
+           ((center.type == blockType) && (blockType == LAVA))) {
+            if ((posX < 0.0) && (posX > -0.5) &&
+                (posZ < 0.0) && (posZ > -0.5)) {
+                return true;
+            }
         /* Check left corner */
         } else if ((posX < -0.5) && (posZ > -0.5) &&
                    (posZ < 0.0)) {
@@ -345,6 +348,7 @@ function Player(x,y,z){
         var isWater = this.collisionBlock(object, world, WATER);
 
         if(isWater) {
+            isWater = this.collisionBlock(object, world, WATER);
             if(this.burning) {
                 this.burning = false;
                 this.emitter.disable();
@@ -354,6 +358,7 @@ function Player(x,y,z){
 
         var isLava = this.collisionBlock(object, world, LAVA);
         if(isLava) {
+            isLava = this.collisionBlock(object, world, LAVA);
             if(!this.burning) {
                this.burning = true;
                this.emitter.enable();
