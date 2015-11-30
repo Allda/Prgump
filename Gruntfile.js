@@ -27,6 +27,7 @@ grunt.initConfig({
 });
 
   grunt.registerTask('default', ['concat', 'watch'])
+  grunt.registerTask('build', ['concat'])
 
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
