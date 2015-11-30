@@ -49,6 +49,7 @@ function Player(x,y,z){
             frameCount: 36,
             loop: 1
         },
+        maxParticleCount: 10000,
         depthTest: true,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
@@ -70,10 +71,12 @@ function Player(x,y,z){
     }
 
     this.jump = function(){
-        if(this.jumpCount < this.maxJumps){
-            this.jumpCount += 1;
-            this.vy = 0.3;
-            this.soundJump.play();
+        if(!this.dead) {
+            if(this.jumpCount < this.maxJumps){
+                this.jumpCount += 1;
+                this.vy = 0.3;
+                this.soundJump.play();
+            }
         }
     }
 
