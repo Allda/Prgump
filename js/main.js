@@ -465,14 +465,16 @@ function Game(){
         gamePause = true;
         player.backAlive()
         scene.remove(finish.getMeshObject());
+        scene.remove(start.getMeshObject());
+
         game.removeAllColectibles();
         Collectibles.starList = [];
         Block.blocklist = [];
         for (var i = 0; i < removableBlocks.length; i++) {
             scene.remove(removableBlocks[i]);
-            $(".shadow").fadeOut("slow");
-            $(".winScreen").fadeOut("slow");
         }
+        $(".shadow").fadeOut("slow");
+        $(".winScreen").fadeOut("slow");
         level++;
         if(level >= mapSrc.length)
             level = 0;
