@@ -5,7 +5,7 @@ test1 = {
 
     finish: {x: 19, y: 4.4, z: 9},
 
-    starTime: {gold : 20, silver:40},
+    starTime: {gold : 10, silver: 20},
 
     collectibles :
         [
@@ -98,7 +98,7 @@ test2 = {
 
     finish: {x: 19, y: 0.4, z: 8},
 
-    starTime: {gold : 20, silver:40},
+    starTime: {gold : 8, silver: 15},
 
     collectibles :
         [
@@ -125,14 +125,14 @@ test2 = {
         ]
 }
 
-map1 = {
+map4 = {
     xSize : 7,
     zSize : 10,
     player: {x: 0, y: 1, z:0},
 
     finish: {x: 6, y: 0.4, z: 9},
 
-    starTime: {gold : 20, silver:40},
+    starTime: {gold : 15, silver: 26},
 
     collectibles :
         [
@@ -206,14 +206,14 @@ map1 = {
         ]
 }
 
-map2 = {
+map5 = {
     xSize : 7,
     zSize : 10,
     player: {x: 0, y: 1, z: 0},
 
     finish: {x: 0, y: 5.4, z: 0},
 
-    starTime: {gold : 20, silver:40},
+    starTime: {gold : 30, silver: 50},
 
     collectibles :
         [
@@ -311,14 +311,14 @@ map2 = {
         ]
 }
 
-map3 = {
+map2 = {
     xSize : 7,
     zSize : 10,
     player: {x: 0, y: 1, z: 0},
 
     finish: {x: 6, y: 3.4, z: 9},
 
-    starTime: {gold : 20, silver:40},
+    starTime: {gold : 12, silver: 18},
 
     collectibles :
         [
@@ -392,14 +392,14 @@ map3 = {
 
 }
 
-map4 = {
+map1 = {
     xSize : 10,
     zSize : 1,
     player: {x: 0, y: 1, z: 0},
 
     finish: {x: 9, y: 5.4, z: 0},
 
-    starTime: {gold : 20, silver:40},
+    starTime: {gold : 4, silver: 7},
 
     collectibles :
         [
@@ -430,14 +430,14 @@ map4 = {
 
 }
 
-map5 = {
+map3 = {
     xSize : 3,
     zSize : 10,
     player: {x: 0, y: 1, z: 0},
 
     finish: {x: 0, y: 5.4, z: 0},
 
-    starTime: {gold : 20, silver:40},
+    starTime: {gold : 12, silver: 26},
 
     collectibles :
         [
@@ -524,11 +524,11 @@ map5 = {
 
 
 mapSrc = [
-    map4,
-    map3,
-    map5,
     map1,
     map2,
+    map3,
+    map4,
+    map5,
     test1,
     test2,
 ]
