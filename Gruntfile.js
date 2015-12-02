@@ -24,11 +24,29 @@ grunt.initConfig({
     },
   },
 },
-});
+
+wget: {
+
+    basic: {
+        overwrite: true,
+      files: {
+        'big_files.zip' : "http://prgump.alesraszka.eu/download/big_files.zip",
+      }
+    }
+},
+
+  unzip: {
+        '.': 'big_files.zip'
+      }
+ });
 
   grunt.registerTask('default', ['concat', 'watch'])
   grunt.registerTask('build', ['concat'])
+  grunt.registerTask('download' ,['wget', 'unzip'])
 
+
+  grunt.loadNpmTasks('grunt-wget');
+  grunt.loadNpmTasks('grunt-zip');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
